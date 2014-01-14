@@ -43,14 +43,31 @@ int main(int argc, char *argv[])
     // -1 = best device with most compute units
     // =>0 - device_id usually same as nvidia_smi ids.
 
-    typedef double scalar;
+    typedef float scalar;
 
     OpenCL ocl(1);
 
 
-    vector_tests<scalar>();
+    //vector_tests<scalar>();
+//    Vector<scalar, GPU>* gpu_vector1 = new Vector<scalar, GPU>(1e5, 1);
+//    printf("GPU1: %f\n", gpu_vector1->sum()); gpu_vector1->print();
 
+//    Vector<scalar, GPU>* gpu_vector2 = new Vector<scalar, GPU>(1e5, 1);
+//    printf("GPU2:\n"); gpu_vector2->print();
+     Vector<scalar, GPU> gpu_vector1 (1e3, 1);
+     Vector<scalar, GPU> gpu_vector2 (1e3, 1);
+     Vector<scalar, GPU> gpu_result = gpu_vector1 + gpu_vector2;
+     gpu_result.print();
 
+    for(int i = 0; i < 4; i++)
+        gpu_vector1 += gpu_vector2;
+    gpu_vector1.print();
+
+//    Vector<scalar, GPU> gpu_result1 =
+//    printf("RESULT:\n");gpu_result.print();
+
+//    delete gpu_vector1;
+//    delete gpu_vector2;
 
 
     ocl.shutdown ();

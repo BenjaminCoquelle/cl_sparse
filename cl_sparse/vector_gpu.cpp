@@ -17,7 +17,18 @@ enqueue kernel N + 2
 readback buffer N + 1
 etc...*/
 
-
+template<typename scalar>
+size_t Vector<scalar, GPU>::roundUp(int group_size, int global_size)
+{
+    int r = global_size % group_size;
+    if(r == 0)
+    {
+        return global_size;
+    } else
+    {
+        return global_size + group_size - r;
+    }
+}
 
 template<typename scalar>
 Vector<scalar, GPU>::Vector()
@@ -104,7 +115,7 @@ const Vector<scalar, GPU> Vector<scalar,GPU>::operator+ (const Vector& other)
         return Vector(0);
     }
 
-    Vector result(*this);
+    Vector<scalar,GPU> result(this->get_size());
 
     Kernel k;
     if(sizeof(scalar) == 4)
@@ -117,7 +128,11 @@ const Vector<scalar, GPU> Vector<scalar,GPU>::operator+ (const Vector& other)
     k.set_buffer(2, result.data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
+
     return result;
 }
 
@@ -129,7 +144,8 @@ const Vector<scalar, GPU> Vector<scalar, GPU>::operator- (const Vector& other)
         qCritical() << "Error Vector(GPU) -: Vectors have different sizes";
         return Vector(0);
     }
-    Vector result(*this);
+
+    Vector result(this->get_size());
 
     Kernel k;
     if(sizeof(scalar) == 4)
@@ -142,7 +158,10 @@ const Vector<scalar, GPU> Vector<scalar, GPU>::operator- (const Vector& other)
     k.set_buffer(2, result.data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
+
     return result;
 }
 
@@ -154,7 +173,8 @@ const Vector<scalar, GPU> Vector<scalar, GPU>::operator* (const Vector& other)
         qCritical() << "Error Vector(GPU): Vectors have different sizes;";
         return Vector(0);
     }
-    Vector result(*this);
+
+    Vector result(this->get_size());
 
     Kernel k;
     if(sizeof(scalar) == 4)
@@ -167,7 +187,9 @@ const Vector<scalar, GPU> Vector<scalar, GPU>::operator* (const Vector& other)
     k.set_buffer(2, result.data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
     return result;
 }
 
@@ -191,7 +213,9 @@ Vector<scalar, GPU>& Vector<scalar, GPU>::operator+= (const Vector& other)
     k.set_buffer(2, this->data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
     return *this;
 
 }
@@ -216,7 +240,9 @@ Vector<scalar, GPU>& Vector<scalar, GPU>::operator-= (const Vector& other)
     k.set_buffer(2, this->data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
     return *this;
 }
 
@@ -240,7 +266,9 @@ Vector<scalar, GPU>& Vector<scalar, GPU>::operator*= (const Vector& other)
     k.set_buffer(2, this->data);
     k.set_int(3, this->size);
 
-    k.execute(256, 512);
+    size_t szLocalWorkSize = 256;
+    size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);
+    k.execute(szLocalWorkSize, szGlobalWorkSize);
     return *this;
 
 }
@@ -261,19 +289,24 @@ void Vector<scalar, GPU>::set(scalar value)
                                 0,
                                 size*sizeof(scalar), 0, 0, &fill_event);
     clWaitForEvents(1, &fill_event);
+     if(error != CL_SUCCESS)
+         qCritical() << "Vector (GPU): set failed, Fill buffer: " << OpenCL::getError(error);
+
+     return
 #else
     scalar* host_array = new scalar[size];
+    std::fill(host_array, host_array+size, value);
 
-    // in case of fill it would be std::fill(host_array, host_array+size, value);
-    std::fill_n(host_array, size, value);
+//    for(int i = 0; i < 5; i++)
+//        printf("host [%d]=%f",i,host_array[i]);
+//    printf("host [%d]=%f",size-1,host_array[size-1]);
 
-    OpenCL::copy(data, host_array, size*sizeof(scalar), CL_FALSE, &fill_event);
-    error = clWaitForEvents(1, &fill_event);
+    OpenCL::copy(data, host_array, size*sizeof(scalar), CL_TRUE, &fill_event);
+    clWaitForEvents(1, &fill_event);
 
     delete [] host_array;
 #endif
-    if(error != CL_SUCCESS)
-        qCritical() << "Vector (GPU): set failed, Fill buffer: " << OpenCL::getError(error);
+
 
 }
 
@@ -296,13 +329,14 @@ void Vector<scalar, GPU>::print(int n)
     }
     else
     {
-        host_data = new scalar [n];
-        OpenCL::copy(host_data, data, n*sizeof(scalar));
+        host_data = new scalar [size];
+        OpenCL::copy(host_data, data, size*sizeof(scalar));
 
-        for (int i = 0; i < n-2; i++)
+        for (int i = 0; i < n-1; i++)
             info << "V[ "<< i << " ] = " << host_data[i] << "\n";
 
-        info << "...,\nV["<< n - 1 << " ] = " << host_data[n-1] << "\n";
+        info << "...,\nV["<< size - 2 << " ] = " << host_data[size-2] << "\n";
+        info << "V["<< size - 1 << " ] = " << host_data[size-1] << "\n";
     }
     qDebug() << qPrintable(QString::fromStdString(info.str()));
     delete [] host_data;
@@ -322,6 +356,12 @@ cl_mem const Vector<scalar, GPU>::get_cdata() const
 
 template <typename scalar>
 int Vector<scalar, GPU>::get_size()
+{
+    return size;
+}
+
+template<typename scalar>
+int const Vector<scalar, GPU>::get_csize() const
 {
     return size;
 }

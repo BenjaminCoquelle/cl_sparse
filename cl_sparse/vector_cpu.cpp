@@ -59,6 +59,60 @@ Vector<scalar, CPU>& Vector<scalar,CPU>::operator= (const Vector& other)
     return *this;
 }
 
+template<typename scalar>
+bool Vector<scalar,CPU>::operator== (const Vector<scalar,CPU>& other)
+{
+    scalar epsilon = 1e-5;
+    bool result = true;
+    int error_count = 0;
+    if(equal(other))
+    {
+        for (int i = 0; i < this->get_size(); i++)
+        {
+            scalar diff = this->data[i]- other.data[i];
+            bool comp = ((diff <= epsilon) && (diff >= -epsilon));
+
+            result &= comp;
+            error_count += !comp;
+        }
+
+    }
+    else result = false;
+
+    return result;
+}
+
+template<typename scalar>
+bool Vector<scalar,CPU>::operator== (const Vector<scalar,GPU>& other)
+{
+    scalar epsilon = 1e-5;
+    bool result = true;
+    int error_count = 0;
+
+
+    if(equal(other))
+    {
+        scalar* o_data = new scalar [this->get_size()];
+        OpenCL::copy(o_data, other.get_cdata(), other.get_csize()*sizeof(scalar));
+
+        for (int i = 0; i < this->get_size(); i++)
+        {
+            scalar diff = this->data[i]- o_data[i];
+            bool comp = ((diff <= epsilon) && (diff >= -epsilon));
+
+            result &= comp;
+            if(!result)
+                qDebug() << "Vector (CPU) ==: Not equal [" << i << "], CPU=" << this->data[i] <<" GPU=" << o_data[i];
+            error_count += !comp;
+        }
+        delete [] o_data;
+
+    }
+    else result = false;
+
+    return result;
+}
+
 
 template<typename scalar>
 const Vector<scalar, CPU> Vector<scalar,CPU>::operator+ (const Vector& other)
@@ -180,6 +234,12 @@ int Vector<scalar, CPU>::get_size() const
 }
 
 template<typename scalar>
+int const Vector<scalar, CPU>::get_csize() const
+{
+    return size;
+}
+
+template<typename scalar>
 scalar* Vector<scalar, CPU>::get_data()
 {
     return data;
@@ -244,9 +304,16 @@ scalar  Vector<scalar, CPU>::sum()
 }
 
 template<typename scalar>
-bool Vector<scalar, CPU>::equal(const Vector& other)
+bool Vector<scalar, CPU>::equal(const Vector<scalar, CPU>& other)
 {
     bool r = (this->size == other.size);
+    return r;
+}
+
+template<typename scalar>
+bool Vector<scalar, CPU>::equal(const Vector<scalar, GPU>& other)
+{
+    bool r = (this->size == other.get_csize());
     return r;
 }
 
@@ -267,7 +334,7 @@ void Vector<scalar, CPU>::print(int n)
         for (int i = 0; i < n-1; i++)
             info << data[i] << ", ";
 
-        info << "..., " << data[n-1] << "]";
+        info << "..., " << data[size-1] << "]";
     }
     qDebug() << qPrintable(QString::fromStdString(info.str()));
 }

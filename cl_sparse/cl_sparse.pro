@@ -12,12 +12,11 @@ TARGET = SPMV_OCL
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = app
+TEMPLATE = lib #app #lib
 
 INCLUDEPATH += /usr/local/cuda/include \
-               /opt/intel/opencl-1.2-3.1.1.11385/include
-LIBS +=      -L/opt/intel/opencl-1.2-3.1.1.11385/lib64 \
-             -lOpenCL
+
+LIBS +=      -lOpenCL
 
 SOURCES += main.cpp \
     ocl.cpp \

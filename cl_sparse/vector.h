@@ -36,10 +36,16 @@ public:
     //*= operator, changes this values
     Vector& operator*= (const Vector& other);
 
+
+    bool operator== (const Vector<scalar, CPU>& other);
+    bool operator== (const Vector<scalar, GPU>& other);
+
+
     const scalar& operator[] (int i);
 
     // get size of the vector
     int     get_size() const;
+    int const get_csize() const;
     // get pointer to data array
     scalar* get_data();
     // get const pointer to data array
@@ -64,7 +70,8 @@ public:
 
 private:
     //compare sizes
-    bool equal(const Vector& other);
+    bool equal(const Vector<scalar, GPU>& other);
+    bool equal(const Vector<scalar, CPU>& other);
 
     int size;
 
@@ -107,7 +114,10 @@ public:
     Vector& operator-= (const Vector& other);
     Vector& operator*= (const Vector& other);
 
+
     int     get_size();
+    int const get_csize() const;
+
     cl_mem  get_data();
     cl_mem const get_cdata() const;
 
@@ -139,6 +149,7 @@ public:
 
 private:
     bool equal(const Vector& other);
+    size_t roundUp(int group_size, int global_size);
 
     //norm 1 implementation
     inline scalar _norm1();

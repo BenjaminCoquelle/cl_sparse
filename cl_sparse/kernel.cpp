@@ -59,7 +59,7 @@ QString Kernel::get_name()
 
 void Kernel::execute(size_t local, size_t global, cl_event* event, std::vector<cl_event>* wait_list )
 {
-    //qDebug() << "Executing kernel " << name << " (" << local << "x" << global << ")";
+    qDebug() << "Executing kernel " << name << " (" << local << "x" << global << ")";
 
     int event_count = 0;
     cl_event *waitforit = NULL;

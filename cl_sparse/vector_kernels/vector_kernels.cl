@@ -234,15 +234,14 @@ __kernel void s_vector_sub(__global const float* a, __global const float* b, __g
 // OpenCL Kernel Function for element by element vector addition single precision
 __kernel void s_vector_add(__global const float* a, __global const float* b, __global float* c, int iNumElements)
 {
-    // get index into global data array
-    int iGID = get_global_id(0);
+    int iGID = get_group_id(0)*(get_local_size(0)) + get_local_id(0);//get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID >= iNumElements)
+    if (iGID < 2*iNumElements)
     {
-        return;
-    }
-    c[iGID] = a[iGID] + b[iGID];
+         // add the vector elements
+         c[iGID] = a[iGID] + b[iGID];
+     }
 }
 
 
@@ -479,20 +478,20 @@ __kernel void d_vector_sub(__global const double* a, __global const double* b, _
     c[iGID] = a[iGID] - b[iGID];
 }
 
-
-__kernel void d_vector_add(__global const double* a, __global const double* b, __global float* c, int iNumElements)
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+__kernel void d_vector_add(__global const double* a, __global const double* b, __global double* c, int iNumElements)
 {
    // get index into global data array
    int iGID = get_global_id(0);
 
    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-   if (iGID >= iNumElements)
+   if (iGID < iNumElements)
    {
-       return;
+        // add the vector elements
+        c[iGID] = a[iGID] + b[iGID];
     }
 
-   // add the vector elements
-   c[iGID] = a[iGID] + b[iGID];
+
 }
 
 #pragma OPENCL EXTENSION cl_khr_fp64 : disable

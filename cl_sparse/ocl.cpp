@@ -332,7 +332,7 @@ void OpenCL::shutdown()
     {
 
         Kernel k = kernels.value (key);
-        qDebug() << "Releasing kernel " << key;
+        //qDebug() << "Releasing kernel " << key;
         clReleaseKernel(k.get_id ());
     }
 
@@ -380,10 +380,10 @@ void OpenCL::build_kernels_map(bool display)
       - in build_program read proper kernel names
       */
     //vector kernels
-    append_kernel(&kernels, "/home/kuba/Projects/my_clMath/my_clMath/vector_kernels/vector_kernels.cl");
+    append_kernel(&kernels, "../../clsparse/cl_sparse/vector_kernels/vector_kernels.cl");
 
     //coo matrix
-    append_kernel(&kernels, "/home/kuba/Projects/my_clMath/my_clMath/coo_kernels/coo_matrix_krenels.cl");
+    append_kernel(&kernels, "../../clsparse/cl_sparse/coo_kernels/coo_matrix_krenels.cl");
 
     if(display)
     {
