@@ -28,6 +28,8 @@ public:
     const Vector operator- (const Vector& other);
     //element-wise multiplication. Creates new object!
     const Vector operator* (const Vector& other);
+    //scale
+    const Vector operator* (const scalar alpha);
 
     //+= operator, changes this values
     Vector& operator+= (const Vector& other);
@@ -35,6 +37,8 @@ public:
     Vector& operator-= (const Vector& other);
     //*= operator, changes this values
     Vector& operator*= (const Vector& other);
+    //scale
+    Vector& operator*= (const scalar alpha);
 
 
     bool operator== (const Vector<scalar, CPU>& other);
@@ -66,6 +70,7 @@ public:
 
     //save to flat file
     void    save(std::string fname);
+    void    load(std::string fname);
     ~Vector();
 
 private:
@@ -109,11 +114,22 @@ public:
     const Vector operator- (const Vector& other);
     //element-wise multiplication. Creates new object!
     const Vector operator* (const Vector& other);
+    //scale
+    const Vector operator* (const scalar alpha);
+
+    const Vector operator* (const cl_mem alpha);
+    //equivalent for above comment
+    //const Vector get_scaled(const cl_mem alpha);
 
     Vector& operator+= (const Vector& other);
     Vector& operator-= (const Vector& other);
-    Vector& operator*= (const Vector& other);
 
+    Vector& operator*= (const Vector& other);
+    //scale
+    Vector& operator*= (const scalar alpha);
+
+    Vector& operator*= (const cl_mem alpha);
+    //void scale(const cl_mem alpha);
 
     int     get_size();
     int const get_csize() const;
@@ -145,6 +161,7 @@ public:
     void    print(int n = 5);
 
     void    save(std::string fname);
+    void    load(std::string fname);
     ~Vector();
 
 private:

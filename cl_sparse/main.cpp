@@ -48,27 +48,40 @@ int main(int argc, char *argv[])
     OpenCL ocl(1);
 
 
-    //vector_tests<scalar>();
-//    Vector<scalar, GPU>* gpu_vector1 = new Vector<scalar, GPU>(1e5, 1);
-//    printf("GPU1: %f\n", gpu_vector1->sum()); gpu_vector1->print();
+    int size = 512;
+    scalar value = 1.0;
+    scalar alpha = 2.0;
+    cl_mem g_alpha;
 
-//    Vector<scalar, GPU>* gpu_vector2 = new Vector<scalar, GPU>(1e5, 1);
-//    printf("GPU2:\n"); gpu_vector2->print();
-     Vector<scalar, GPU> gpu_vector1 (1e3, 1);
-     Vector<scalar, GPU> gpu_vector2 (1e3, 1);
-     Vector<scalar, GPU> gpu_result = gpu_vector1 + gpu_vector2;
-     gpu_result.print();
+    OpenCL::allocate(&g_alpha, sizeof(scalar));
+    OpenCL::copy(g_alpha, &alpha, sizeof(scalar));
 
-    for(int i = 0; i < 4; i++)
-        gpu_vector1 += gpu_vector2;
+    Vector<scalar, GPU> gpu_vector1(size, value);
     gpu_vector1.print();
+    Vector<scalar, GPU> gpu_vector2(size, value);
+    gpu_vector1.print();
+    Vector<scalar, CPU> cpu_vector1(size, value);
+    cpu_vector1.print();
 
-//    Vector<scalar, GPU> gpu_result1 =
-//    printf("RESULT:\n");gpu_result.print();
+    Vector<scalar, GPU> gpu_result1 = gpu_vector1 * alpha;
+    Vector<scalar, GPU> gpu_result2 = gpu_vector2 * g_alpha;
+    Vector<scalar, CPU> cpu_result  = cpu_vector1 * alpha;
 
-//    delete gpu_vector1;
-//    delete gpu_vector2;
+    printf("\nRESULTS\n");
+    gpu_result1.print();
+    gpu_result2.print();
+    cpu_result.print();
 
+    gpu_vector1 *= alpha;
+    gpu_vector2 *= g_alpha;
+    cpu_vector1 *= alpha;
+
+    printf("\nRESULTS2: \n");
+    gpu_result1.print();
+    gpu_result2.print();
+    cpu_vector1.print();
+
+    bool result = cpu_result == gpu_result1;
 
     ocl.shutdown ();
 

@@ -126,9 +126,8 @@ const Vector<scalar, CPU> Vector<scalar,CPU>::operator+ (const Vector& other)
     Vector result(*this);
 
     for (int i = 0; i < this->size; i++)
-    {
-        result.data[i] += other.data[i];
-    }
+            result.data[i] += other.data[i];
+
     return result;
 }
 
@@ -143,9 +142,8 @@ const Vector<scalar, CPU> Vector<scalar,CPU>::operator- (const Vector& other)
     Vector result(*this);
 
     for (int i = 0; i < this->size; i++)
-    {
-        result.data[i] -= other.data[i];
-    }
+            result.data[i] -= other.data[i];
+
     return result;
 }
 
@@ -160,9 +158,18 @@ const Vector<scalar, CPU> Vector<scalar,CPU>::operator* (const Vector& other)
     Vector result(*this);
 
     for (int i = 0; i < this->size; i++)
-    {
-        result.data[i] *= other.data[i];
-    }
+            result.data[i] *= other.data[i];
+
+    return result;
+}
+
+template<typename scalar>
+const Vector<scalar, CPU> Vector<scalar, CPU>::operator* (const scalar alpha)
+{
+    Vector result(*this);
+    for (int i = 0; i < this->size; i++)
+        result.data[i] = alpha * this->data[i];
+
     return result;
 }
 
@@ -209,6 +216,13 @@ Vector<scalar, CPU>& Vector<scalar, CPU>::operator*= (const Vector& other)
         this->data[i] *= other.data[i];
     }
     return *this;
+}
+
+template<typename scalar>
+Vector<scalar, CPU>& Vector<scalar, CPU>::operator*= (const scalar alpha)
+{
+    for (int i = 0; i < this->size; i++)
+        this->data[i] = alpha * this->data[i];
 }
 
 template<typename scalar>
@@ -355,6 +369,30 @@ void Vector<scalar, CPU>::save(std::string fname)
     for (int i = 0; i < size; i++)
         out << data[i] << "\n";
     file.close();
+}
+
+template<typename scalar>
+void Vector<scalar, CPU>::load(std::string fname)
+{
+    QFile file(fname.c_str());
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qCritical() << "Vector (GPU) load: Problem with opening [" << fname.c_str() <<"] to load vector data";
+        return;
+    }
+    QTextStream in(&file);
+
+    QVector<scalar> vector;
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        vector.append(scalar(line.toDouble()));
+    }
+
+    this->size = vector.size();
+    memcpy(this->get_data(), vector.data(), this->size*sizeof(scalar));
 }
 
 template<typename scalar>

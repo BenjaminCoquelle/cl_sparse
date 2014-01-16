@@ -86,6 +86,14 @@ private Q_SLOTS:
     void Operator_plus_double();
     void Operator_plus_double_data();
 
+    //scale functions
+    void Operator_scale_float();
+    void Operator_scale_float_data();
+
+    void Operator_scale_double();
+    void Operator_scale_double_data();
+
+
     //from cpu and gpu constructors
     void Operator_constr_float();
     void Operator_constr_double();
@@ -111,7 +119,11 @@ private Q_SLOTS:
     void Test_dot_float();
     void Test_dot_double();
 
-
+    //save & load
+    void Test_io_float();
+    void Test_io_double();
+    void Test_io_float_data();
+    void Test_io_double_data();
 
 };
 

@@ -1,4 +1,5 @@
 #include "ocl.h"
+#include "clBLAS.h"
 #include "iostream"
 #include <QStringList>
 
@@ -24,13 +25,16 @@ OpenCL::OpenCL (int device_id)
     OpenCL::platform_initialized = false;
     OpenCL::queue_initialized = false;
 
-
-
     build_errors_map();
     initialize (device_id);
 
     build_kernels_map();
-
+#ifdef CL_BLAS
+    cl_int err = clblasSetup();
+        if (err != CL_SUCCESS) {
+            qDebug() << "clblasSetup failed\n";
+        }
+#endif
 }
 
 
@@ -321,6 +325,9 @@ void OpenCL::build_errors_map()
 
 void OpenCL::shutdown()
 {
+#ifdef CL_BLAS
+    clblasTeardown();
+#endif
     //cleanup created OpenCL structures
 
     //command queue
@@ -457,9 +464,14 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
     kernels["s_vector_mul"] = get_kernel(program, "s_vector_mul");
     kernels["d_vector_mul"] = get_kernel(program, "d_vector_mul");
 
-
     kernels["s_vector_sum"] = get_kernel(program, "s_vector_sum");
     kernels["d_vector_sum"] = get_kernel(program, "d_vector_sum");
+
+    kernels["s_vector_scale_scalar"] = get_kernel(program, "s_vector_scale_scalar");
+    kernels["s_vector_scale_mem"] = get_kernel(program, "s_vector_scale_mem");
+
+    kernels["d_vector_scale_scalar"] = get_kernel(program, "d_vector_scale_scalar");
+    kernels["d_vector_scale_mem"] = get_kernel(program, "d_vector_scale_mem");
 
 
     kernels["s_vector_dot"] = get_kernel(program, "s_vector_dot");

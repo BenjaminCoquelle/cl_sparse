@@ -206,42 +206,62 @@ __kernel void s_vector_norm2(__global float *g_idata, __global float *g_odata, u
 __kernel void s_vector_mul(__global const float* a, __global const float* b, __global float* c, int iNumElements)
 {
     // get index into global data array
-    int iGID = get_global_id(0);
+    int i = get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID >= iNumElements)
+    if (i >= iNumElements)
     {
         return;
     }
-    c[iGID] = a[iGID] * b[iGID];
+    c[i] = a[i] * b[i];
 }
 
 // OpenCL Kernel Function for element by element vector subtraction single precision
 __kernel void s_vector_sub(__global const float* a, __global const float* b, __global float* c, int iNumElements)
 {
     // get index into global data array
-    int iGID = get_global_id(0);
+    int i = get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID >= iNumElements)
+    if (i >= iNumElements)
     {
         return;
     }
-    c[iGID] = a[iGID] - b[iGID];
+    c[i] = a[i] - b[i];
 }
 
 
 // OpenCL Kernel Function for element by element vector addition single precision
 __kernel void s_vector_add(__global const float* a, __global const float* b, __global float* c, int iNumElements)
 {
-    int iGID = get_group_id(0)*(get_local_size(0)) + get_local_id(0);//get_global_id(0);
+    int i = get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID < 2*iNumElements)
+    if (i < iNumElements)
     {
          // add the vector elements
-         c[iGID] = a[iGID] + b[iGID];
+         c[i] = a[i] + b[i];
      }
+}
+
+// OpenCL Kernel function for scaling vector with cl_float factor
+__kernel void s_vector_scale_scalar(__global float* a, float alpha, int N)
+{
+    int i = get_global_id(0);
+
+    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
+    if (i < N)
+        a[i] *= alpha;
+}
+
+// OpenCL Kernel function for scaling vector with factor type cl_mem
+__kernel void s_vector_scale_mem (__global float* a, global float* alpha, int N)
+{
+    int i = get_global_id(0);
+
+    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
+    if (i < N)
+        a[i] *= alpha[0];
 }
 
 
@@ -454,44 +474,61 @@ __kernel void d_vector_norm2(__global double *g_idata, __global double *g_odata,
 __kernel void d_vector_mul(__global const double* a, __global const double* b, __global double* c, int iNumElements)
 {
     // get index into global data array
-    int iGID = get_global_id(0);
+    int i = get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID >= iNumElements)
+    if (i >= iNumElements)
     {
         return;
     }
-    c[iGID] = a[iGID] * b[iGID];
+    c[i] = a[i] * b[i];
 }
 
 // OpenCL Kernel Function for element by element vector subtraction double precision
 __kernel void d_vector_sub(__global const double* a, __global const double* b, __global double* c, int iNumElements)
 {
     // get index into global data array
-    int iGID = get_global_id(0);
+    int i = get_global_id(0);
 
     // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-    if (iGID >= iNumElements)
+    if (i >= iNumElements)
     {
         return;
     }
-    c[iGID] = a[iGID] - b[iGID];
+    c[i] = a[i] - b[i];
 }
 
-#pragma OPENCL EXTENSION cl_khr_fp64 : enable
 __kernel void d_vector_add(__global const double* a, __global const double* b, __global double* c, int iNumElements)
 {
    // get index into global data array
-   int iGID = get_global_id(0);
+   int i = get_global_id(0);
 
    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
-   if (iGID < iNumElements)
+   if (i < iNumElements)
    {
         // add the vector elements
-        c[iGID] = a[iGID] + b[iGID];
+        c[i] = a[i] + b[i];
     }
+}
 
+// OpenCL Kernel function for scaling vector with cl_float factor
+__kernel void d_vector_scale_scalar(__global double* a, double alpha, int N)
+{
+    int i = get_global_id(0);
 
+    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
+    if (i < N)
+        a[i] *= alpha;
+}
+
+// OpenCL Kernel function for scaling vector with factor type cl_mem
+__kernel void d_vector_scale_mem (__global double* a, global double* alpha, int N)
+{
+    int i = get_global_id(0);
+
+    // bound check (equivalent to the limit on a 'for' loop for standard/serial C code
+    if (i < N)
+        a[i] *= alpha[0];
 }
 
 #pragma OPENCL EXTENSION cl_khr_fp64 : disable

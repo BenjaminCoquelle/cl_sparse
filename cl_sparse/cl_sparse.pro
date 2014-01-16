@@ -42,3 +42,15 @@ OTHER_FILES += \
     resources/brief_csr_multip.txt \
     coo_kernels/coo_matrix_krenels.cl \
     vector_kernels/vector_kernels.cl
+
+DEFINES+= CL_BLAS
+
+#Dependencies from clBlas library
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/release/ -lclBLAS
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/debug/ -lclBLAS
+else:symbian: LIBS += -lclBLAS
+else:unix: LIBS += -L$$PWD/../clBLAS/bin/library/ -lclBLAS
+
+INCLUDEPATH += $$PWD/../clBLAS/src
+DEPENDPATH += $$PWD/../clBLAS/src

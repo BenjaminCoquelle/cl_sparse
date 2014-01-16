@@ -280,6 +280,90 @@ void VectorTest::Operator_mul_double()
 
 }
 
+void VectorTest::Operator_scale_float_data()
+{
+    float_data();
+}
+
+void VectorTest::Operator_scale_double_data()
+{
+    double_data();
+}
+
+
+void VectorTest::Operator_scale_float()
+{
+    typedef float scalar;
+    QFETCH(int, size);
+    QFETCH(scalar, value);
+
+    scalar alpha = 2.0;
+    cl_mem g_alpha;
+
+    OpenCL::allocate(&g_alpha, sizeof(scalar));
+    OpenCL::copy(g_alpha, &alpha, sizeof(scalar));
+
+    Vector<scalar, GPU> gpu_vector1(size, value);
+    Vector<scalar, GPU> gpu_vector2(size, value);
+    Vector<scalar, CPU> cpu_vector1(size, value);
+
+    Vector<scalar, GPU> gpu_result1 = gpu_vector1 * alpha;
+    Vector<scalar, GPU> gpu_result2 = gpu_vector2 * g_alpha;
+    Vector<scalar, CPU> cpu_result  = cpu_vector1 * alpha;
+
+    bool result = cpu_result == gpu_result1;
+    QVERIFY(result);
+    result = cpu_result == gpu_result2;
+    QVERIFY(result);
+
+    gpu_vector1 *= alpha;
+    gpu_vector2 *= g_alpha;
+    cpu_vector1 *= alpha;
+
+    result = cpu_vector1 == gpu_vector1;
+    QVERIFY(result);
+    result = cpu_vector1 == gpu_result2;
+    QVERIFY(result);
+}
+
+void VectorTest::Operator_scale_double()
+{
+    typedef double scalar;
+    QFETCH(int, size);
+    QFETCH(scalar, value);
+
+    scalar alpha = 2.0;
+    cl_mem g_alpha;
+
+    OpenCL::allocate(&g_alpha, sizeof(scalar));
+    OpenCL::copy(g_alpha, &alpha, sizeof(scalar));
+
+    Vector<scalar, GPU> gpu_vector1(size, value);
+    Vector<scalar, GPU> gpu_vector2(size, value);
+    Vector<scalar, CPU> cpu_vector1(size, value);
+
+    Vector<scalar, GPU> gpu_result1 = gpu_vector1 * alpha;
+    Vector<scalar, GPU> gpu_result2 = gpu_vector2 * g_alpha;
+    Vector<scalar, CPU> cpu_result  = cpu_vector1 * alpha;
+
+    bool result = cpu_result == gpu_result1;
+    QVERIFY(result);
+    result = cpu_result == gpu_result2;
+    QVERIFY(result);
+
+    gpu_vector1 *= alpha;
+    gpu_vector2 *= g_alpha;
+    cpu_vector1 *= alpha;
+
+    result = cpu_vector1 == gpu_vector1;
+    QVERIFY(result);
+    result = cpu_vector1 == gpu_result2;
+    QVERIFY(result);
+
+}
+
+
+
 void VectorTest::Operator_constr_float_data()
 {
     float_data();
@@ -611,3 +695,79 @@ void VectorTest::Test_norm_double()
     OpenCL::copy(&gh_norm2, gg_norm2, sizeof(scalar));
     QVERIFY(compare_d(g_norm2, gh_norm2));
 }
+
+void VectorTest::Test_io_float_data()
+{
+    float_data();
+}
+
+void VectorTest::Test_io_double_data()
+{
+    double_data();
+}
+
+
+void VectorTest::Test_io_float()
+{
+    typedef float scalar;
+    QFETCH(int, size);
+    QFETCH(scalar, value);
+
+
+    std::string cpu_name = "cpu.txt";
+    std::string gpu_name = "gpu.txt";
+
+    Vector<scalar, CPU> c(size, value);
+    c.save(cpu_name);
+
+    Vector<scalar, CPU> r(size);
+    r.load(cpu_name);
+
+    bool result = c == r;
+    QVERIFY(result);
+
+    Vector<scalar, GPU> g(size, value);
+    g.save(gpu_name);
+
+    Vector<scalar, GPU> gr(size);
+    gr.load(gpu_name);
+
+    result = r == gr;
+    QVERIFY(result);
+
+}
+
+
+void VectorTest::Test_io_double()
+{
+    typedef double scalar;
+
+    QFETCH(int, size);
+    QFETCH(scalar, value);
+
+
+    std::string cpu_name = "cpu.txt";
+    std::string gpu_name = "gpu.txt";
+
+    Vector<scalar, CPU> c(size, value);
+    c.save(cpu_name);
+
+    Vector<scalar, CPU> r(size);
+    r.load(cpu_name);
+
+    bool result = c == r;
+    QVERIFY(result);
+
+    Vector<scalar, GPU> g(size, value);
+    g.save(gpu_name);
+
+    Vector<scalar, GPU> gr(size);
+    gr.load(gpu_name);
+
+    result = r == gr;
+    QVERIFY(result);
+}
+
+
+
+
