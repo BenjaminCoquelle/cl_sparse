@@ -27,7 +27,10 @@ SOURCES += main.cpp \
     timer.cpp \
     matrixcoo_cpu.cpp \
     mmio.cpp \
-    matrixcoo_gpu.cpp
+    matrixcoo_gpu.cpp \
+    matrixell_cpu.cpp \
+    matrixcsr_cpu.cpp \
+    matrixcsr_gpu.cpp
 
 HEADERS += ocl.h \
     vector.h \
@@ -36,11 +39,14 @@ HEADERS += ocl.h \
     types.h \
     matrixcoo.h \
     matrix_types.h \
-    mmio.h
+    mmio.h \
+    matrixell.h \
+    matrixcsr.h
 
 OTHER_FILES += \
     resources/brief_csr_multip.txt \
     coo_kernels/coo_matrix_krenels.cl \
+    csr_kernels/csr_matrix_krenels.cl \
     vector_kernels/vector_kernels.cl
 
 DEFINES+= CL_BLAS

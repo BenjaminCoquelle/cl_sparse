@@ -8,7 +8,7 @@ QT       += testlib
 
 QT       -= gui
 
-TARGET = tst_vector
+TARGET = cl_sparse_tests
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -22,12 +22,14 @@ LIBS +=      -L/opt/intel/opencl-1.2-3.1.1.11385/lib64 \
 SOURCES += \
     main.cpp \
     vector_test.cpp \
-    vector_benchmark.cpp
+    vector_benchmark.cpp \
+    matrix_benchmark.cpp
 
 
 HEADERS += \
     vector_test.h \
-    vector_benchmark.h
+    vector_benchmark.h \
+    matrix_benchmark.h
 
 
 #Dependency from SPMV_OCL

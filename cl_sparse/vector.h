@@ -45,7 +45,7 @@ public:
     bool operator== (const Vector<scalar, GPU>& other);
 
 
-    const scalar& operator[] (int i);
+    const scalar& operator[] (int i) const;
 
     // get size of the vector
     int     get_size() const;

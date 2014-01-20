@@ -392,6 +392,9 @@ void OpenCL::build_kernels_map(bool display)
     //coo matrix
     append_kernel(&kernels, "../../clsparse/cl_sparse/coo_kernels/coo_matrix_krenels.cl");
 
+    //csr matrix
+    append_kernel(&kernels, "../../clsparse/cl_sparse/csr_kernels/csr_matrix_krenels.cl");
+
     if(display)
     {
         int i = 0;
@@ -495,6 +498,8 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
     kernels["s_kernel_coo_spmv_reduce_update"] = get_kernel(program, "kernel_coo_spmv_reduce_update");
     kernels["s_kernel_coo_spmv_serial"] = get_kernel(program, "kernel_coo_spmv_serial");
 
+    //csr matrix
+    kernels["kernel_csr_spmv_vector"] = get_kernel(program, "kernel_csr_spmv_vector");
 
     clReleaseProgram(program);
 }

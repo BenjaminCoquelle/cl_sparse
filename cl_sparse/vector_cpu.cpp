@@ -1,4 +1,5 @@
 #include "ocl.h"
+#include <assert.h>
 #include "vector.h"
 #include <QFile>
 
@@ -12,6 +13,8 @@ Vector<scalar,CPU>::Vector()
 template<typename scalar>
 Vector<scalar,CPU>::Vector(int size)
 {
+    assert (size > 0);
+
     this->size = size;
     data = new scalar[size];
 }
@@ -19,6 +22,7 @@ Vector<scalar,CPU>::Vector(int size)
 template<typename scalar>
 Vector<scalar, CPU>::Vector(int size, scalar value)
 {
+    assert( size > 0);
     this->size = size;
     data = new scalar[size];
 
@@ -226,14 +230,17 @@ Vector<scalar, CPU>& Vector<scalar, CPU>::operator*= (const scalar alpha)
 }
 
 template<typename scalar>
-const scalar& Vector<scalar, CPU>::operator[] (int i)
+const scalar& Vector<scalar, CPU>::operator[] (int i) const
 {
+    assert (i < size);
     if(i < size)
         return this->data[i];
     else
         qDebug() << "Vector (CPU) []: index out of range i=" << i << " size=" << size;
 
 }
+
+
 
 template<typename scalar>
 void Vector<scalar, CPU>::set(scalar value)

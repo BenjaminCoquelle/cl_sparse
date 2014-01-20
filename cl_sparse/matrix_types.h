@@ -15,7 +15,7 @@
 
 
 /// Matrix Names
-const std::string _matrix_format_names [8] = {"COO",
+const std::string _matrix_format_names [4] = {"COO",
                                               "CSR",
                                               "ELL",
                                               "HYB"
@@ -67,12 +67,26 @@ struct s_MatrixCSR {
   ValueType *val;
 };
 
+/// Sparse Matrix - Sparse Compressed Row Format
+template <typename ValueType, typename IndexType>
+struct s_gMatrixCSR {
+  /// Row offsets (row ptr)
+  IndexType row_offset;
+
+  /// Column index
+  IndexType col;
+
+  /// Values
+  ValueType val;
+};
+
+
 
 /// Sparse Matrix - ELL Format (see ELL_IND for indexing)
-template <typename ValueType, typename IndexType, typename Index = IndexType>
+template <typename ValueType, typename IndexType>
 struct s_MatrixELL {
   /// Maximal elements per row
-  Index max_row;
+  int max_row;
 
   /// Column index
   IndexType *col;
@@ -81,10 +95,23 @@ struct s_MatrixELL {
   ValueType *val;
 };
 
+/// Sparse Matrix - ELL Format (see ELL_IND for indexing)
+template <typename ValueType, typename IndexType>
+struct s_gMatrixELL {
+  /// Maximal elements per row
+  int max_row;
+
+  /// Column index
+  IndexType col;
+
+  /// Values
+  ValueType val;
+};
+
 /// Sparse Matrix - Contains ELL and COO Matrices
 template <typename ValueType, typename IndexType, typename Index = IndexType>
 struct s_MatrixHYB {
-  s_MatrixELL<ValueType, IndexType, Index> ELL;
+  s_MatrixELL<ValueType, IndexType> ELL;
   s_MatrixCOO<ValueType, IndexType> COO;
 };
 

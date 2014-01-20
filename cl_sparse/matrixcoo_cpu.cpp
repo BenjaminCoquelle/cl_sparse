@@ -1,6 +1,79 @@
 #include "matrixcoo.h"
 #include "mmio.h"
 
+
+
+/**
+  Helper class for reading matrix from MM format
+  Keeps only one row from file.
+*/
+template <typename scalar>
+class coo_element
+{
+public:
+    scalar val;
+    int row;
+    int col;
+
+    coo_element()
+    {
+        _valid = false;
+    }
+
+    coo_element(int r, int c, scalar v)
+    {
+        row = r;
+        col = c;
+        val = v;
+        _valid = true;
+    }
+private:
+    bool _valid;
+};
+
+
+/**
+    Sorter to convert matrix from COO to CSR format
+*/
+template <typename scalar>
+class coo_sort_ascending
+{
+public:
+    inline
+    bool operator()(coo_element<scalar> const & e1,
+                    coo_element<scalar> const & e2)
+    {
+        if (e1.row == e2.row)
+        {
+            return (e1.col < e2.col);
+        }
+        else
+        {
+            return (e1.row < e2.row);
+        }
+    }
+};
+
+/**
+    To get rid of the warinings proper read format have to be used.
+  */
+template < typename scalar >
+int readline(FILE* f, int& row, int& column, scalar& v) { return -1; }
+
+template<>
+int readline<double>(FILE* f, int&row, int& column, double& v)
+{
+    return fscanf(f, "%d %d %lg\n", &row, &column, &v);
+}
+
+template<>
+int readline<float>(FILE* f, int&row, int& column, float& v)
+{
+    return fscanf(f, "%d %d %g\n", &row, &column, &v);
+}
+
+
+
 template<typename scalar>
 MatrixCOO<scalar, CPU>::MatrixCOO()
 {
@@ -14,8 +87,12 @@ MatrixCOO<scalar, CPU>::MatrixCOO()
 }
 
 template<typename scalar>
-MatrixCOO<scalar, CPU>::MatrixCOO(const int* row, const int* col, const scalar* val, int nnz, int nrow, int ncol)
+MatrixCOO<scalar, CPU>::MatrixCOO(const int* row, const int* col, const scalar* val, const int nnz, const int nrow, const int ncol)
 {
+    assert( nnz   >= 0);
+    assert( ncol  >= 0);
+    assert( nrow  >= 0);
+
     this->nnz = nnz;
     this->nrow = nrow;
     this->ncol = ncol;
@@ -31,14 +108,29 @@ MatrixCOO<scalar, CPU>::MatrixCOO(const int* row, const int* col, const scalar* 
 }
 
 template<typename scalar>
+MatrixCOO<scalar, CPU>::MatrixCOO(const MatrixCOO<scalar, GPU>& other)
+{
+
+    allocate(other.get_nnz(), other.get_nrow(), other.get_ncol());
+
+    OpenCL::copy(this->mat.row, other.get_rowPtr(), nnz*sizeof(int));
+    OpenCL::copy(this->mat.col, other.get_colPtr(), nnz*sizeof(int));
+    OpenCL::copy(this->mat.val, other.get_valPtr(), nnz*sizeof(scalar));
+}
+
+template<typename scalar>
 MatrixCOO<scalar, CPU>::~MatrixCOO()
 {
     clear();
 }
 
 template<typename scalar>
-void MatrixCOO<scalar, CPU>::allocate(int nnz, int nrow, int ncol)
+void MatrixCOO<scalar, CPU>::allocate(const int nnz, const int nrow, const int ncol)
 {
+    assert( nnz   >= 0);
+    assert( ncol  >= 0);
+    assert( nrow  >= 0);
+
     clear();
     this->mat.row = new int [nnz];
     this->mat.col = new int [nnz];
@@ -58,9 +150,9 @@ void MatrixCOO<scalar, CPU>::clear()
         delete [] this->mat.col;
         delete [] this->mat.val;
 
-        this->mat.row = 0;
-        this->mat.col = 0;
-        this->mat.val = 0;
+        this->mat.row = NULL;
+        this->mat.col = NULL;
+        this->mat.val = NULL;
 
         this->nrow = 0;
         this->ncol = 0;
@@ -70,21 +162,39 @@ void MatrixCOO<scalar, CPU>::clear()
 
 
 template<typename scalar>
-int MatrixCOO<scalar, CPU>::get_nnz()
+int const MatrixCOO<scalar, CPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template<typename scalar>
-int MatrixCOO<scalar, CPU>::get_nrow()
+int const MatrixCOO<scalar, CPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template<typename scalar>
-int MatrixCOO<scalar, CPU>::get_ncol()
+int const MatrixCOO<scalar, CPU>::get_ncol() const
 {
     return this->ncol;
+}
+
+template<typename scalar>
+int* const MatrixCOO<scalar, CPU>::get_rowPtr() const
+{
+    return this->mat.row;
+}
+
+template<typename scalar>
+int* const MatrixCOO<scalar, CPU>::get_colPtr() const
+{
+    return this->mat.col;
+}
+
+template<typename scalar>
+scalar* const MatrixCOO<scalar, CPU>::get_valPtr() const
+{
+    return this->mat.val;
 }
 
 template<typename scalar>
@@ -96,103 +206,88 @@ void MatrixCOO<scalar, CPU>::info()
 template<typename scalar>
 void MatrixCOO<scalar, CPU>::load(const std::string& fname_mtx)
 {
-    // Follow example_read.c (from Matrix Market web site)
-    int ret_code;
     MM_typecode matcode;
-    FILE *f;
-    int M, N;
-    int fnz, nnz;  // file nnz, real nnz
-    bool sym = false;
+    FILE* f;
 
-    printf("loading %s\n", fname_mtx.c_str());
-
-    if ((f = fopen(fname_mtx.c_str(), "r")) == NULL) {
-      printf("ReadFileMTX cannot open file:  %s\n", fname_mtx.c_str());
-      return;
+    if ((f = fopen(fname_mtx.c_str(), "r")) == NULL)
+    {
+        printf("Error (load (CPU)): Can't open file %s.\n", fname_mtx.c_str());
+        return;
     }
 
     if (mm_read_banner(f, &matcode) != 0)
-      {
-        printf("ReadFileMTX could not process Matrix Market banner.\n");
+    {
+        printf("Error (load (CPU)): Could not process matrix market banner!\n");
         return;
-      }
+    }
 
-
-    /*  This is how one can screen matrix types if their application */
-    /*  only supports a subset of the Matrix Market data types.      */
-
-    if (mm_is_complex(matcode) && mm_is_matrix(matcode) &&
-        mm_is_sparse(matcode) )
-      {
-        printf("ReadFileMTX does not support Market Market type: %s\n", mm_typecode_to_str(matcode));
+    //we support only sparse, matrix in coordinate format
+    if (mm_is_matrix(matcode) && mm_is_sparse(matcode) && mm_is_coordinate(matcode) && (mm_is_general(matcode)
+        || mm_is_symmetric(matcode)) && !mm_is_pattern(matcode))  { }
+    else
+    {
+        printf("Error (load (CPU)): Matrix banner: %s is unsupported!\n", mm_typecode_to_str(matcode));
         return;
-      }
+    }
 
     /* find out size of sparse matrix .... */
-
-    if ((ret_code = mm_read_mtx_crd_size(f, &M, &N, &fnz)) !=0) {
-      printf("ReadFileMTX matrix size error\n");
-      return;
+    int ret_code = mm_read_mtx_crd_size(f, &nrow, &ncol, &nnz);
+    if ( ret_code != 0)
+    {
+        printf("Error (load (CPU)): Can not obtain matrix size");
     }
 
-    nnz = fnz ;
+    //printf("INFO: %s, [%s]: rows: %d, cols: %d, nnz: %d.\n", fname_mtx.c_str(), mm_typecode_to_str(matcode), nrow, ncol, nnz);
 
-    /* reseve memory for matrices */
-    if(mm_is_symmetric(matcode)) {
+    scalar v;
+    int row, column;
 
-      if (N != M) {
-        printf("ReadFileMTX non-squared symmetric matrices are not supported\n");
-        printf("What is symmetric and non-squared matrix? e-mail me\n");
-        return;
-      }
+    /* NOTE: when reading in doubles, ANSI C requires the use of the "l"      */
+    /*       specifier as in "%lg", "%lf", "%le", otherwise errors will occur */
+    /*       (ANSI C X3.159-1989, Sec. 4.9.6.2, p. 136 lines 13-15)           */
+    std::vector<coo_element<scalar> > coo_matrix(nnz);
 
-      nnz = 2*(nnz - N) + N;
-      sym = true ;
+    //read matrix in coo format
+    for (int i = 0; i < nnz; i++)
+    {
+        ret_code = readline<scalar>(f, row, column, v);
+        if (ret_code == 0) printf("Warning (load CPU): Problem with reading file at row %d.\n", i);
+        //zero based index
+        row--;
+        column--;
+        coo_matrix[i] = coo_element<scalar>(row, column, v);
     }
-
-    this->allocate(nnz,M,N);
-
-    int ii=0;
-    int col, row;
-    scalar val;
-    int ret;
-    for (int i=0; i<fnz; ++i) {
-        if(sizeof(val) == 8)
-            ret = fscanf(f, "%d %d %lg\n", &row, &col, &val);
-        else
-            ret = fscanf(f, "%d %d %f\n", &row, &col, &val);
-
-      if (!ret)
-      {
-          printf("Problem with reading %s at row %d\n", fname_mtx.c_str(), row);
-          return;
-      }
-
-
-      row--; /* adjust from 1-based to 0-based */
-      col--;
-
-      assert (ret == 3);
-
-      //    LOG_INFO(row << " " << col << " " << val);
-
-      this->mat.row[ii] = row;
-      this->mat.col[ii] = col;
-      this->mat.val[ii] = val;
-
-      if (sym && (row!=col)) {
-        ++ii;
-        this->mat.row[ii] = col;
-        this->mat.col[ii] = row;
-        this->mat.val[ii] = val;
-      }
-
-      ++ii;
-    }
-
-    printf("ReadFileMTX: filename= %s. Done\n", fname_mtx.c_str());
 
     fclose(f);
+
+    //Expand symmetrix matrix if necessary
+    if (mm_is_symmetric(matcode))
+    {
+        for (int i = 0; i < nnz; i++)
+        {
+            if (coo_matrix[i].row != coo_matrix[i].col)
+            {
+                int r = coo_matrix[i].col;
+                int c = coo_matrix[i].row;
+                coo_matrix.push_back(coo_element<scalar>(r, c, coo_matrix[i].val));
+            }
+        }
+    }
+
+    std::sort (coo_matrix.begin(), coo_matrix.end(), coo_sort_ascending<scalar>());
+    allocate(nnz, nrow, ncol);
+
+    for(int i = 0; i < nnz; i++)
+    {
+        this->mat.row[i] = coo_matrix[i].row;
+        this->mat.col[i] = coo_matrix[i].col;
+        this->mat.val[i] = coo_matrix[i].val;
+
+        //printf("row: %d, col: %d, val: %f\n", hr[i], hc[i], hv[i]);
+    }
+
+
+    //printf("loading of filename= %s. Done\n", fname_mtx.c_str());
 }
 
 template<typename scalar>
@@ -201,7 +296,7 @@ void MatrixCOO<scalar, CPU>::save(const std::string& fname_mtx)
     MM_typecode matcode;
     FILE *f;
 
-    printf("WriteFileMTX: filename= %s; writing...\n", fname_mtx.c_str());
+    printf("save matrix to filename= %s\n", fname_mtx.c_str());
 
     if ((f = fopen(fname_mtx.c_str(), "w")) == NULL) {
       printf("WriteFileMTX cannot open file %s\n", fname_mtx.c_str());
@@ -227,7 +322,7 @@ void MatrixCOO<scalar, CPU>::save(const std::string& fname_mtx)
               this->mat.col[i]+1,
               this->mat.val[i]);
 
-    printf("WriteFileMTX: filename=%s; done\n", fname_mtx.c_str());
+    printf("saving of filename=%s completed\n", fname_mtx.c_str());
 
     fclose(f);
 }
@@ -248,20 +343,20 @@ double MatrixCOO<scalar, CPU>::get_troughput(const double& time)
 
 
 template<typename scalar>
-void MatrixCOO<scalar, CPU>::multiply(Vector<scalar, CPU>& in, Vector<scalar, CPU>* out)
+void MatrixCOO<scalar, CPU>::multiply(const Vector<scalar, CPU>& in, Vector<scalar, CPU>& out)
 {
-    assert(in.  get_size() >= 0);
-    assert(out->get_size() >= 0);
-    assert(in.  get_size() == this->get_ncol());
-    assert(out->get_size() == this->get_nrow());
+    assert(in.get_size()  >= 0);
+    assert(out.get_size() >= 0);
+    assert(in.get_size()  == this->get_ncol());
+    assert(out.get_size() == this->get_nrow());
 
     int nnz = this->get_nnz();
 
     //zero out vector;
-    out->set(0);
+    out.set(0);
 
-    scalar* out_data = out->get_data();
-    scalar* in_data  = in.get_data();
+    scalar* out_data = out.get_data();
+    const scalar* in_data  = in.get_cdata();
     for (int i = 0; i < nnz; ++i)
         out_data[this->mat.row[i]] += this->mat.val[i] * in_data[ this->mat.col[i] ];
 
@@ -269,6 +364,29 @@ void MatrixCOO<scalar, CPU>::multiply(Vector<scalar, CPU>& in, Vector<scalar, CP
 
 }
 
+template<typename scalar>
+void MatrixCOO<scalar, CPU>::get_data(const MatrixCSR<scalar, CPU> &matrix)
+{
+    assert ( matrix.get_nrow() > 0);
+    assert ( matrix.get_ncol() > 0);
+    assert ( matrix.get_nnz()  > 0);
+
+    allocate(matrix.get_nnz(), matrix.get_nrow(), matrix.get_ncol());
+
+    int* row_offset = matrix.get_rowPtr();
+    int* col = matrix.get_colPtr();
+    scalar* val = matrix.get_valPtr();
+
+    for (int i = 0; i < nrow; i++)
+        for (int j = row_offset[i]; j < row_offset[i+1]; j++)
+            this->mat.row[j] = i;
+
+    for (int i = 0; i < nnz; i++)
+        this->mat.col[i] = col[i];
+
+    for (int i = 0; i < nnz; i++)
+        this->mat.val[i] = val[i];
+}
 
 template class MatrixCOO<float, CPU>;
 template class MatrixCOO<double, CPU>;
