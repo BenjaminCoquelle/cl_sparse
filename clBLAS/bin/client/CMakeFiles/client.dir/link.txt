@@ -1,0 +1,1 @@
+/usr/bin/c++   -m64  -O3 -DNDEBUG    CMakeFiles/client.dir/client.cpp.o CMakeFiles/client.dir/stdafx.cpp.o CMakeFiles/client.dir/statisticalTimer.cpp.o  -o ../staging/client -rdynamic -Wl,-Bstatic -lboost_program_options-mt -Wl,-Bdynamic -lOpenCL ../library/libclBLAS.so.2.1.0 -lOpenCL -lm 

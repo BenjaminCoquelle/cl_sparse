@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/kuba/Projects/my_clMath/clsparse/clBLAS/bin/library/tplgen-prefix/src/tplgen/tplgen.cpp
+iostream
+-
+fstream
+-
+string
+-
+stdlib.h
+-
+string.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+unistd.h
+-
+time.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+

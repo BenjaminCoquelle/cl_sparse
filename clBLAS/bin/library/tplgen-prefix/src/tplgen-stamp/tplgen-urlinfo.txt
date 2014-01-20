@@ -1,0 +1,3 @@
+repository='external project URL'
+module='/home/kuba/Projects/my_clMath/clsparse/clBLAS/src/library/tools/tplgen'
+tag=''

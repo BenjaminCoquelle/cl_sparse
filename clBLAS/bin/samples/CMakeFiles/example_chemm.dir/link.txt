@@ -1,0 +1,1 @@
+/usr/bin/c++   -m64  -O3 -DNDEBUG    CMakeFiles/example_chemm.dir/example_chemm.cpp.o  -o example_chemm -rdynamic -lOpenCL ../library/libclBLAS.so.2.1.0 -lOpenCL -lm 

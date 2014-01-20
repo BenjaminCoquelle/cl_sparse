@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-GUnix Makefiles;/home/kuba/Projects/my_clMath/clsparse/clBLAS/bin/library/tplgen-prefix/src/tplgen'

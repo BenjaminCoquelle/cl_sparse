@@ -1,0 +1,1 @@
+/usr/bin/gcc  -m64  -std=c99 -Wstrict-prototypes -std=c99 -Wstrict-prototypes -std=c99 -Wstrict-prototypes -O3 -DNDEBUG    CMakeFiles/example_zher2.dir/example_zher2.c.o  -o example_zher2 -rdynamic -lOpenCL ../library/libclBLAS.so.2.1.0 -lOpenCL -lm 
