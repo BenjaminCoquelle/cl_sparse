@@ -494,12 +494,17 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
 
 
     //coo matrix
-    kernels["s_kernel_coo_spmv_flat"] = get_kernel(program, "kernel_coo_spmv_flat");
-    kernels["s_kernel_coo_spmv_reduce_update"] = get_kernel(program, "kernel_coo_spmv_reduce_update");
-    kernels["s_kernel_coo_spmv_serial"] = get_kernel(program, "kernel_coo_spmv_serial");
+    kernels["s_kernel_coo_spmv_flat"] = get_kernel(program, "s_kernel_coo_spmv_flat");
+    kernels["s_kernel_coo_spmv_reduce_update"] = get_kernel(program, "s_kernel_coo_spmv_reduce_update");
+    kernels["s_kernel_coo_spmv_serial"] = get_kernel(program, "s_kernel_coo_spmv_serial");
+
+    kernels["d_kernel_coo_spmv_flat"] = get_kernel(program, "d_kernel_coo_spmv_flat");
+    kernels["d_kernel_coo_spmv_reduce_update"] = get_kernel(program, "d_kernel_coo_spmv_reduce_update");
+    kernels["d_kernel_coo_spmv_serial"] = get_kernel(program, "d_kernel_coo_spmv_serial");
 
     //csr matrix
-    kernels["kernel_csr_spmv_vector"] = get_kernel(program, "kernel_csr_spmv_vector");
+    kernels["s_kernel_csr_spmv_vector"] = get_kernel(program, "s_kernel_csr_spmv_vector");
+    kernels["d_kernel_csr_spmv_vector"] = get_kernel(program, "d_kernel_csr_spmv_vector");
 
     clReleaseProgram(program);
 }

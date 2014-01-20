@@ -173,7 +173,11 @@ void MatrixCSR<scalar,GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scala
     localWorkSize[0] = WARP_SIZE * 8;
     globalWorkSize[0] = localWorkSize[0] * 128;
 
-    Kernel k = OpenCL::kernels["kernel_csr_spmv_vector"];
+    Kernel k;
+    if (sizeof(scalar) == 4)
+        k = OpenCL::kernels["s_kernel_csr_spmv_vector"];
+    else
+        k = OpenCL::kernels["d_kernel_csr_spmv_vector"];
     k.set_int(0, this->nrow);
     k.set_buffer(1, this->mat.row_offset);
     k.set_buffer(2, this->mat.col);

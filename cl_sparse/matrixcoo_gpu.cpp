@@ -251,7 +251,11 @@ void MatrixCOO<scalar, GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scal
 
 
         // Set arguments for kernel call
-        Kernel k = OpenCL::kernels["s_kernel_coo_spmv_flat"];
+        Kernel k;
+        if(sizeof(scalar) == 4)
+            k = OpenCL::kernels["s_kernel_coo_spmv_flat"];
+        else
+            k = OpenCL::kernels["d_kernel_coo_spmv_flat"];
         k.set_int     (0, tail);
         k.set_int     (1, interval_size);
         k.set_buffer  (2, this->mat.row);
@@ -301,7 +305,10 @@ void MatrixCOO<scalar, GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scal
 
 
         // Set arguments for kernel call
-        k = OpenCL::kernels["s_kernel_coo_spmv_reduce_update"];
+        if (sizeof(scalar) == 4)
+            k = OpenCL::kernels["s_kernel_coo_spmv_reduce_update"];
+        else
+            k = OpenCL::kernels["d_kernel_coo_spmv_reduce_update"];
         k.set_int     (0, active_warps);
         k.set_buffer  (1, temp_rows);
         k.set_buffer  (2, temp_vals);
@@ -326,7 +333,10 @@ void MatrixCOO<scalar, GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scal
         //int nnz = this->get_nnz();
 
         // Set arguments for kernel call
-        k = OpenCL::kernels["s_kernel_coo_spmv_serial"];
+        if (sizeof(scalar) == 4)
+            k = OpenCL::kernels["s_kernel_coo_spmv_serial"];
+        else
+            k = OpenCL::kernels["d_kernel_coo_spmv_serial"];
         k.set_int(0, nnz);
         k.set_buffer(1, this->mat.row);
         k.set_buffer(2, this->mat.col);

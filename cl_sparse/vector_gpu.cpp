@@ -264,7 +264,7 @@ const Vector<scalar, GPU> Vector<scalar, GPU>::operator* (const scalar alpha)
     }
 
     k.set_buffer(0, result.get_data());
-    k.set_intr(2, result.get_size());
+    k.set_int(2, result.get_size());
 
     size_t szLocalWorkSize = 256;
     size_t szGlobalWorkSize = roundUp(szLocalWorkSize, this->size);

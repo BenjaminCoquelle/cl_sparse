@@ -18,11 +18,14 @@ private:
 
     OpenCL* ocl;
 
-    Vector<float, GPU>* fg;
-    MatrixCOO<float, GPU>* coo;
-    MatrixCSR<float, GPU>* csr;
 
-    void float_data();
+    MatrixCOO<float, GPU>* coo_float;
+    MatrixCSR<float, GPU>* csr_float;
+
+    MatrixCOO<double, GPU>* coo_double;
+    MatrixCSR<double, GPU>* csr_double;
+
+    void generate_data();
 
     void warmup();
 
@@ -39,6 +42,11 @@ private Q_SLOTS:
     void bench_Test_COO_float();
     void bench_Test_COO_float_data();
 
+    void bench_Test_CSR_double();
+    void bench_Test_CSR_double_data();
+
+    void bench_Test_COO_double();
+    void bench_Test_COO_double_data();
 
 };
 

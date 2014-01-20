@@ -14,8 +14,10 @@ void MatrixBenchmark::initTestCase()
 
 void MatrixBenchmark::cleanupTestCase()
 {
-    delete coo;
-    delete csr;
+//    delete csr_float;
+//    delete csr_double;
+//    delete coo_float;
+//    delete coo_double;
 
     ocl->shutdown();
     delete ocl;
@@ -29,7 +31,7 @@ void MatrixBenchmark::warmup()
         w.dot(w);
 }
 
-void MatrixBenchmark::float_data()
+void MatrixBenchmark::generate_data()
 {
     QTest::addColumn<QString>("matrix_path");
 
@@ -40,22 +42,33 @@ void MatrixBenchmark::float_data()
     QTest::newRow("webbase-1M") << QString("/media/Storage/matrices/Bell_MTX/webbase-1M.mtx");
     QTest::newRow("shipsec1") << QString("/media/Storage/matrices/Bell_MTX/shipsec1.mtx");
     QTest::newRow("thermal2") << QString("/media/Storage/matrices/Bell_MTX/thermal2.mtx");
-//    QTest::newRow("e40r0100") << QString("/media/Storage/matrices/Bell_MTX/e40r0100.mtx");
-//    QTest::newRow("cop20k_A") << "/media/Storage/matrices/Bell_MTX/cop20k_A.mtx";
-//    QTest::newRow("scircuit") << "/media/Storage/matrices/Bell_MTX/scircuit.mtx";
-//    QTest::newRow("mc2depi")  << "/media/Storage/matrices/Bell_MTX/mc2depi.mtx";
+    QTest::newRow("e40r0100") << QString("/media/Storage/matrices/Bell_MTX/e40r0100.mtx");
+    QTest::newRow("cop20k_A") << QString("/media/Storage/matrices/Bell_MTX/cop20k_A.mtx");
+    QTest::newRow("scircuit") << QString("/media/Storage/matrices/Bell_MTX/scircuit.mtx");
+    QTest::newRow("mc2depi")  << QString("/media/Storage/matrices/Bell_MTX/mc2depi.mtx");
 }
 
 
 void MatrixBenchmark::bench_Test_COO_float_data()
 {
-    float_data();
+    generate_data();
 }
 
 void MatrixBenchmark::bench_Test_CSR_float_data()
 {
-    float_data();
+    generate_data();
 }
+
+void MatrixBenchmark::bench_Test_COO_double_data()
+{
+    generate_data();
+}
+
+void MatrixBenchmark::bench_Test_CSR_double_data()
+{
+    generate_data();
+}
+
 
 void MatrixBenchmark::init()
 {
@@ -72,16 +85,18 @@ void MatrixBenchmark::bench_Test_COO_float()
     typedef float scalar;
     QFETCH(QString, matrix_path);
 
-    coo = new MatrixCOO<float, GPU>();
-    coo->load(matrix_path.toStdString());
+    coo_float = new MatrixCOO<scalar, GPU>();
+    coo_float->load(matrix_path.toStdString());
 
 
-    Vector<scalar, GPU> x(coo->get_ncol(), 1.0);
-    Vector<scalar, GPU> b(coo->get_nrow(), 0.0);
+    Vector<scalar, GPU> x(coo_float->get_ncol(), 1.0);
+    Vector<scalar, GPU> b(coo_float->get_nrow(), 0.0);
 
     QBENCHMARK {
-        coo->multiply(x,b);
+        coo_float->multiply(x,b);
     }
+    //qDebug() << b.norm();
+    delete coo_float;
 
 }
 
@@ -90,14 +105,58 @@ void MatrixBenchmark::bench_Test_CSR_float()
     typedef float scalar;
     QFETCH(QString, matrix_path);
 
-    csr = new MatrixCSR<float, GPU>();
-    csr->load(matrix_path.toStdString());
+    csr_float = new MatrixCSR<scalar, GPU>();
+    csr_float->load(matrix_path.toStdString());
 
 
-    Vector<scalar, GPU> x(csr->get_ncol(), 1.0);
-    Vector<scalar, GPU> b(csr->get_nrow(), 0.0);
+    Vector<scalar, GPU> x(csr_float->get_ncol(), 1.0);
+    Vector<scalar, GPU> b(csr_float->get_nrow(), 0.0);
 
     QBENCHMARK {
-        csr->multiply(x,b);
+        csr_float->multiply(x,b);
     }
+    //qDebug() << b.norm();
+    delete csr_float;
 }
+
+
+void MatrixBenchmark::bench_Test_COO_double()
+{
+    typedef double scalar;
+    QFETCH(QString, matrix_path);
+
+    coo_double = new MatrixCOO<scalar, GPU>();
+    coo_double->load(matrix_path.toStdString());
+
+
+    Vector<scalar, GPU> x(coo_double->get_ncol(), 1.0);
+    Vector<scalar, GPU> b(coo_double->get_nrow(), 0.0);
+
+    QBENCHMARK {
+        coo_double->multiply(x,b);
+    }
+    //qDebug() << b.norm();
+    delete coo_double;
+
+}
+
+void MatrixBenchmark::bench_Test_CSR_double()
+{
+    typedef double scalar;
+    QFETCH(QString, matrix_path);
+
+    csr_double = new MatrixCSR<scalar, GPU>();
+    csr_double->load(matrix_path.toStdString());
+
+
+    Vector<scalar, GPU> x(csr_double->get_ncol(), 1.0);
+    Vector<scalar, GPU> b(csr_double->get_nrow(), 0.0);
+
+    QBENCHMARK {
+        csr_double->multiply(x,b);
+    }
+   // qDebug() << b.norm();
+    delete csr_double;
+}
+
+

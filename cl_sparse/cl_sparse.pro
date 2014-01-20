@@ -49,7 +49,7 @@ OTHER_FILES += \
     csr_kernels/csr_matrix_krenels.cl \
     vector_kernels/vector_kernels.cl
 
-DEFINES+= CL_BLAS
+#DEFINES+= CL_BLAS
 
 #Dependencies from clBlas library
 
