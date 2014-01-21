@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     matrixcoo_gpu.cpp \
     matrixell_cpu.cpp \
     matrixcsr_cpu.cpp \
-    matrixcsr_gpu.cpp
+    matrixcsr_gpu.cpp \
+    matrixell_gpu.cpp
 
 HEADERS += ocl.h \
     vector.h \
@@ -47,7 +48,8 @@ OTHER_FILES += \
     resources/brief_csr_multip.txt \
     coo_kernels/coo_matrix_krenels.cl \
     csr_kernels/csr_matrix_krenels.cl \
-    vector_kernels/vector_kernels.cl
+    vector_kernels/vector_kernels.cl \
+    ell_kernels/ell_matrix_krenels.cl
 
 #DEFINES+= CL_BLAS
 

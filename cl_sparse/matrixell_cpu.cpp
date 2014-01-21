@@ -10,20 +10,15 @@ MatrixELL<scalar, CPU>::MatrixELL()
 }
 
 template<typename scalar>
-MatrixELL<scalar, CPU>::MatrixELL(const int nnz, const int nrow, const int ncol, const int max_row)
+MatrixELL<scalar, CPU>::MatrixELL(const MatrixELL<scalar, GPU>& other)
 {
-    assert( nnz   >= 0);
-    assert( ncol  >= 0);
-    assert( nrow  >= 0);
-    assert( max_row >= 0);
 
-    clear();
+    allocate(other.get_nnz(), other.get_nrow(), other.get_ncol(), other.get_max_row());
 
-    if (nnz > 0)
-    {
-        assert(nnz == max_row * nrow);
-        allocate(nnz, nrow, ncol, max_row);
-    }
+    OpenCL::copy(this->mat.col, other.get_colPtr(), nnz * sizeof(int));
+    OpenCL::copy(this->mat.val, other.get_valPtr(), nnz * sizeof(scalar));
+
+
 }
 
 
@@ -59,7 +54,8 @@ void MatrixELL<scalar, CPU>::allocate(const int nnz, const int nrow, const int n
     assert( nrow  >= 0);
     assert( max_row >= 0);
     assert( nnz == max_row*nrow);
-    clear();
+
+    //clear();
 
     this->mat.val = new scalar [nnz];
     this->mat.col = new int [nnz];

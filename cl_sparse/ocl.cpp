@@ -395,6 +395,9 @@ void OpenCL::build_kernels_map(bool display)
     //csr matrix
     append_kernel(&kernels, "../../clsparse/cl_sparse/csr_kernels/csr_matrix_krenels.cl");
 
+    //ell matrix
+    append_kernel(&kernels, "../../clsparse/cl_sparse/ell_kernels/ell_matrix_krenels.cl");
+
     if(display)
     {
         int i = 0;
@@ -505,6 +508,9 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
     //csr matrix
     kernels["s_kernel_csr_spmv_vector"] = get_kernel(program, "s_kernel_csr_spmv_vector");
     kernels["d_kernel_csr_spmv_vector"] = get_kernel(program, "d_kernel_csr_spmv_vector");
+
+    kernels["s_kernel_ell_spmv"] = get_kernel(program, "s_kernel_ell_spmv");
+    kernels["d_kernel_ell_spmv"] = get_kernel(program, "d_kernel_ell_spmv");
 
     clReleaseProgram(program);
 }

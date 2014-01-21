@@ -134,6 +134,7 @@ void MatrixCSR<scalar, GPU>::load(const std::string &fname_mtx)
     MatrixCSR<scalar, CPU> m;
     m.load(fname_mtx);
 
+    clear();
     allocate(m.get_nnz(), m.get_nrow(), m.get_ncol());
 
     OpenCL::copy(this->mat.val, m.get_valPtr(), nnz*sizeof(scalar));

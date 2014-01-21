@@ -143,6 +143,7 @@ void MatrixCOO<scalar, GPU>::load(const std::string& fname_mtx)
     MatrixCOO<scalar, CPU> m;
     m.load(fname_mtx);
 
+    clear();
     allocate(m.get_nnz(), m.get_nrow(), m.get_ncol());
 
     OpenCL::copy(this->mat.row, m.get_rowPtr(), nnz*sizeof(int));
