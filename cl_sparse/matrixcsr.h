@@ -45,11 +45,9 @@ public:
 
     void allocate(const int nnz, const int nrow, const int ncol);
 
-    //set data to ell matrix
-    void set_data(MatrixELL<scalar, CPU>& matrix);
 
-    void set_data(MatrixCOO<scalar, CPU>& matrix);
     void get_data(const MatrixCOO<scalar, CPU>& matrix);
+    void get_data(const MatrixELL<scalar, CPU>& matrix);
 
 private:
     int nnz;
@@ -98,11 +96,8 @@ public:
 
     void multiply(const Vector<scalar, CPU>& in, Vector<scalar, CPU>& out);
 
-    //set data to ell matrix
-    void set_data(MatrixELL<scalar, CPU>& matrix);
-
-    void set_data(MatrixCOO<scalar, CPU>& matrix);
     void get_data(const MatrixCOO<scalar, CPU>& matrix);
+    void get_data(const MatrixELL<scalar, CPU>& matrix);
 
 private:
 

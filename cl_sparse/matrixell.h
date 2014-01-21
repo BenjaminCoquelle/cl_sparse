@@ -32,10 +32,12 @@ public:
 
     ~MatrixELL();
 
-    int get_nnz();
-    int get_nrow();
-    int get_ncol();
-    int get_max_row();
+    int const get_nnz() const;
+    int const get_nrow() const;
+    int const get_ncol() const;
+    int const get_max_row() const;
+
+
 
     double get_troughput(const double& time);
 
@@ -43,13 +45,10 @@ public:
 
     void allocate(const int nnz, const int nrow, const int ncol, const int max_row);
 
-    //get data from CSR matrix to this
-    void set_data(const MatrixCSR<scalar, CPU> &matrix);
-
     //set data to CSR from this
     void get_data(MatrixCSR<scalar, CPU> &matrix);
 
-
+    void multiply(const Vector<scalar, CPU>& in, Vector<scalar, CPU>& out);
 private:
     int nnz;
     int nrow;
@@ -64,6 +63,7 @@ private:
 template <typename scalar>
 class MatrixELL<scalar, CPU>
 {
+public:
     //default constructo, does nothing
     MatrixELL();
 
@@ -77,10 +77,14 @@ class MatrixELL<scalar, CPU>
 
     ~MatrixELL();
 
-    int get_nnz();
-    int get_nrow();
-    int get_ncol();
-    int get_max_row();
+    int const get_nnz() const;
+    int const get_nrow() const;
+    int const get_ncol() const;
+    int const get_max_row() const;
+
+    //get pointers;
+    scalar* const get_valPtr() const;
+    int* const get_colPtr() const;
 
     double get_troughput(const double& time);
 
@@ -88,11 +92,10 @@ class MatrixELL<scalar, CPU>
 
     void allocate(const int nnz, const int nrow, const int ncol, const int max_row);
 
-    //get data from CSR matrix to this
-    void set_data(const MatrixCSR<scalar, CPU> &matrix);
-
     //set data to CSR from this
     void get_data(MatrixCSR<scalar, CPU> &matrix);
+
+    void multiply(const Vector<scalar, CPU>& in, Vector<scalar, CPU>& out);
 
 private:
     s_MatrixELL<scalar, int> mat;
@@ -103,6 +106,7 @@ private:
 
     //friend class Matrix
 };
+
 
 
 #endif // MATRIXELL_H

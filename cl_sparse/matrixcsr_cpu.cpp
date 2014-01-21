@@ -79,7 +79,7 @@ void MatrixCSR<scalar, CPU>::allocate(const int nnz, const int nrow, const int n
     assert(ncol >= 0);
     assert(nrow >= 0);
 
-    clear();
+    //clear();
 
     if (nnz > 0)
     {
@@ -205,6 +205,65 @@ void MatrixCSR<scalar, CPU>::get_data(const MatrixCOO<scalar, CPU> &matrix)
         last = temp;
     }
 
+}
+
+template<typename scalar>
+void MatrixCSR<scalar, CPU>::get_data(const MatrixELL<scalar, CPU> &matrix)
+{
+    assert(matrix.get_nnz() > 0);
+    assert(matrix.get_nrow() > 0);
+    assert(matrix.get_ncol() > 0);
+
+    //ELL data pointers
+    int*    col = matrix.get_colPtr();
+    scalar* val = matrix.get_valPtr();
+
+
+    //do not call allocate!
+    this->nrow = matrix.get_nrow();
+    this->ncol = matrix.get_ncol();
+    this->mat.row_offset = new int [nrow+1];
+
+    //calculate row_offsets
+    for (int ai = 0; ai < nrow; ai++)
+        for (int n = 0; n < matrix.get_max_row(); n++)
+        {
+            int aj = ELL_IND(ai, n, nrow, matrix.get_max_row());
+
+            if ((col[aj] >= 0) && (col[aj] < ncol))
+                this->mat.row_offset[ai] += 1;
+        }
+
+    //fill the row_offset array
+    nnz = 0;
+    for (int i = 0; i < nrow; i++)
+    {
+        int tmp = this->mat.row_offset[i];
+        this->mat.row_offset[i] = nnz;
+        nnz += tmp;
+    }
+    this->mat.row_offset[nrow] = nnz;
+
+    //fill the col and val arrays
+    this->mat.col = new int [this->nnz];
+    this->mat.val = new scalar [this->nnz];
+
+    for (int ai = 0; ai < nrow; ai++)
+    {
+        int index = this->mat.row_offset[ai];
+
+        for (int n = 0; n < matrix.get_max_row(); n++)
+        {
+            int aj = ELL_IND(ai, n, nrow, matrix.get_max_row());
+
+            if ( (col[aj] >= 0) && (col[aj] < ncol) )
+            {
+                this->mat.col[index] = col [aj];
+                this->mat.val[index] = val [aj];
+                index ++;
+            }
+        }
+    }
 }
 
 template<typename scalar>

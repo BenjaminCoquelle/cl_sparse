@@ -64,6 +64,7 @@ public:
     //copy data from input to internal str : USELESS!
     MatrixCOO(const int* row, const int* col, const scalar* val, const int nnz, const int nrow, const int ncol);
 
+    //UŻYWAĆ Z ROZWAGĄ!
     MatrixCOO(const MatrixCOO<scalar, GPU>& other);
 
     ~MatrixCOO();

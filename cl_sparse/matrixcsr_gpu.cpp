@@ -21,7 +21,7 @@ MatrixCSR<scalar, GPU>::MatrixCSR(const int nnz, const int nrow, const int ncol)
     assert( ncol  >= 0);
     assert( nrow  >= 0);
 
-    clear();
+    //clear();
 
     if (nnz > 0)
         allocate(nnz, nrow, ncol);
@@ -72,7 +72,7 @@ void MatrixCSR<scalar, GPU>::allocate(const int nnz, const int nrow, const int n
     assert(ncol >= 0);
     assert(nrow >= 0);
 
-    clear();
+    //clear();
 
     if (nnz > 0)
     {

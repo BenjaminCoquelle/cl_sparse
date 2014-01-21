@@ -27,7 +27,7 @@ MatrixCOO<scalar, GPU>::MatrixCOO(const int* row, const int* col, const scalar* 
     assert( ncol  >= 0);
     assert( nrow  >= 0);
 
-    //clear is called in allocate
+
     allocate(nnz, nrow, ncol);
 
 
@@ -63,7 +63,7 @@ void MatrixCOO<scalar, GPU>::allocate(const int nnz, const int nrow, const int n
     assert( ncol  >= 0);
     assert( nrow  >= 0);
 
-    clear();
+
     this->nnz = nnz;
     this->ncol = ncol;
     this->nrow = nrow;

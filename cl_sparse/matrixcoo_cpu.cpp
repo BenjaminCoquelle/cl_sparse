@@ -77,9 +77,9 @@ int readline<float>(FILE* f, int&row, int& column, float& v)
 template<typename scalar>
 MatrixCOO<scalar, CPU>::MatrixCOO()
 {
-    this->mat.row = NULL;
-    this->mat.col = NULL;
-    this->mat.val = NULL;
+    this->mat.row = 0;
+    this->mat.col = 0;
+    this->mat.val = 0;
 
     this->nnz = 0;
     this->nrow = 0;
@@ -97,7 +97,6 @@ MatrixCOO<scalar, CPU>::MatrixCOO(const int* row, const int* col, const scalar* 
     this->nrow = nrow;
     this->ncol = ncol;
 
-    //clear is called in allocate
     allocate(nnz, nrow, ncol);
 
     memcpy(this->mat.row, row, this->nnz*sizeof(int));
@@ -110,7 +109,7 @@ MatrixCOO<scalar, CPU>::MatrixCOO(const int* row, const int* col, const scalar* 
 template<typename scalar>
 MatrixCOO<scalar, CPU>::MatrixCOO(const MatrixCOO<scalar, GPU>& other)
 {
-
+    //clear();
     allocate(other.get_nnz(), other.get_nrow(), other.get_ncol());
 
     OpenCL::copy(this->mat.row, other.get_rowPtr(), nnz*sizeof(int));
@@ -131,7 +130,6 @@ void MatrixCOO<scalar, CPU>::allocate(const int nnz, const int nrow, const int n
     assert( ncol  >= 0);
     assert( nrow  >= 0);
 
-    clear();
     this->mat.row = new int [nnz];
     this->mat.col = new int [nnz];
     this->mat.val = new scalar [nnz];
@@ -146,9 +144,9 @@ void MatrixCOO<scalar, CPU>::clear()
 {
     if(this->get_nnz() > 0)
     {
-        delete [] this->mat.row;
-        delete [] this->mat.col;
-        delete [] this->mat.val;
+        free(mat.row);
+        free(mat.col);
+        free(mat.val);
 
         this->mat.row = NULL;
         this->mat.col = NULL;
@@ -157,6 +155,7 @@ void MatrixCOO<scalar, CPU>::clear()
         this->nrow = 0;
         this->ncol = 0;
         this->nnz = 0;
+
     }
 }
 
@@ -317,10 +316,13 @@ void MatrixCOO<scalar, CPU>::save(const std::string& fname_mtx)
        of a vector has index 1, not 0.  */
     int nnz = this->get_nnz();
     for (int i=0; i < nnz; i++)
-      fprintf(f, "%d %d %f\n",
-              this->mat.row[i]+1,
-              this->mat.col[i]+1,
-              this->mat.val[i]);
+    {
+
+          fprintf(f, "%d %d %f\n",
+                  this->mat.row[i]+1,
+                  this->mat.col[i]+1,
+                  this->mat.val[i]);
+    }
 
     printf("saving of filename=%s completed\n", fname_mtx.c_str());
 

@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
 
 
     std::string fmtx = "/media/Storage/matrices/Bell_MTX/orani678.mtx";
-    typedef float scalar;
+    //std::string fmtx = "/media/Storage/matrices/vampir/pores_1.mtx";
+    typedef double scalar;
 
     OpenCL ocl(1);
 
@@ -54,23 +55,32 @@ int main(int argc, char *argv[])
 
     Vector<scalar, GPU> x(coo.get_ncol(), 1.0);
     Vector<scalar, GPU> b(coo.get_nrow(), 0.0);
-
     coo.multiply(x,b);
     printf("coo b norm %f\n", b.norm());
     b.save("b_coo_result.txt");
+
+
 
     MatrixCSR<scalar, GPU> csr;
     csr.load(fmtx);
 
     Vector<scalar, GPU> in(csr.get_ncol(), 1.0);
     Vector<scalar, GPU> out(csr.get_nrow(), 0.0);
-
     csr.multiply(in, out);
     printf("csr b norm %f\n", out.norm());
     out.save("b_csr_result.txt");
 
 
 
+    MatrixELL<scalar, CPU> ell;
+    ell.load(fmtx);
+
+
+    Vector<scalar, CPU> a(ell.get_ncol(),1.0);
+    Vector<scalar, CPU> c(ell.get_nrow(), 0.0);
+    ell.multiply(a,c);
+    printf("ell b norm %f\n", c.norm());
+    c.save("b_ell_result.txt");
 
     ocl.shutdown ();
 
