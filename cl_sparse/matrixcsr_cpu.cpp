@@ -296,5 +296,100 @@ void MatrixCSR<scalar, CPU>::multiply(const Vector<scalar, CPU>& in, Vector<scal
 }
 
 
+template<typename scalar>
+void MatrixCSR<scalar, CPU>::get_data(const MatrixHYB<scalar, CPU>& matrix)
+{
+    assert (matrix.get_nnz() > 0);
+    assert (matrix.get_nnz() == matrix.get_ell_nnz() + matrix.get_coo_nnz());
+    assert (matrix.get_nrow() > 0);
+    assert (matrix.get_ncol() > 0);
+
+    this->ncol = matrix.get_ncol();
+    this->nrow = matrix.get_nrow();
+
+    this->mat.row_offset = new int [nrow+1];
+    // zero the row_offset?
+
+    int*    ell_col = matrix.get_ellColPtr();
+    scalar* ell_val = matrix.get_ellValPtr();
+
+    int*    coo_col = matrix.get_cooColPtr();
+    int*    coo_row = matrix.get_cooRowPtr();
+    scalar* coo_val = matrix.get_cooValPtr();
+
+    int start = 0;
+
+    for (int ai = 0; ai < nrow; ai++)
+    {
+        //ELL
+        for (int n = 0; n < matrix.get_ell_max_row(); n++)
+        {
+            int aj = ELL_IND(ai, n, matrix.get_nrow(), matrix.get_ell_max_row());
+
+            if ((ell_col[aj] >= 0) && (ell_col[aj] < ncol))
+                this->mat.row_offset[ai] += 1;
+        }
+
+        //COO
+        for (int i = start; i < matrix.get_coo_nnz(); i++)
+        {
+            if (coo_row[i] == ai)
+            {
+                this->mat.row_offset[ai] += 1;
+                start++;
+            }
+            if (coo_row[i] > ai)
+                break;
+        }
+    }
+
+    this->nnz = 0;
+    for (int i = 0; i < matrix.get_nrow(); i++)
+    {
+        int tmp = this->mat.row_offset[i];
+        this->mat.row_offset[i] = this->nnz;
+        this->nnz += tmp;
+    }
+    this->mat.row_offset[nrow] = this->nnz;
+
+    this->mat.col = new int     [nnz];
+    this->mat.val = new scalar  [nnz];
+
+    start = 0;
+    for (int ai = 0; ai < nrow; ai++)
+    {
+        int index = this->mat.row_offset[ai];
+
+        //ELL
+        for (int n = 0; n < matrix.get_ell_max_row(); n++)
+        {
+            int aj = ELL_IND(ai, n, nrow, matrix.get_ell_max_row());
+
+            if ((ell_col[aj] >= 0) && (ell_col[aj] < ncol))
+            {
+                this->mat.col[index] = ell_col[aj];
+                this->mat.val[index] = ell_val[aj];
+                index++;
+            }
+        }
+
+        //COO
+        for (int i = start; i < matrix.get_coo_nnz(); i++)
+        {
+            if (coo_row[i] == ai)
+            {
+                this->mat.col[index] = coo_col[i];
+                this->mat.val[index] = coo_val[i];
+                index++;
+                start++;
+            }
+            if (coo_row[i] > ai)
+                break;
+        }
+    }
+}
+
+
 template class MatrixCSR<float, CPU>;
 template class MatrixCSR<double, CPU>;
+

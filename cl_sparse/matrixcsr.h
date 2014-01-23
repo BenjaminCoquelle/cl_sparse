@@ -6,6 +6,7 @@
 #include <matrix_types.h>
 #include <matrixell.h>
 #include <matrixcoo.h>
+#include <matrixhyb.h>
 #include <vector.h>
 #include <assert.h>
 
@@ -14,6 +15,8 @@ template<typename scalar, DeviceType device>
 class MatrixCOO;
 template<typename scalar, DeviceType device>
 class MatrixELL;
+template<typename scalar, DeviceType device>
+class MatrixHYB;
 
 
 
@@ -98,6 +101,7 @@ public:
 
     void get_data(const MatrixCOO<scalar, CPU>& matrix);
     void get_data(const MatrixELL<scalar, CPU>& matrix);
+    void get_data(const MatrixHYB<scalar, CPU>& matrix);
 
 private:
 

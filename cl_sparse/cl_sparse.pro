@@ -12,11 +12,24 @@ TARGET = SPMV_OCL
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = app #lib #app #lib
+TEMPLATE = lib #app #lib
 
 INCLUDEPATH += /usr/local/cuda/include \
 
 LIBS +=      -lOpenCL
+
+#DEFINES+= CL_BLAS
+
+#Dependencies from clBlas library
+contains(DEFINES, CL_BLAS) {
+    message("Compilation with clBLAS library, make sure that clBLAS is built first")
+    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/release/ -lclBLAS
+    else:unix: LIBS += -L$$PWD/../clBLAS/bin/library/ -lclBLAS
+
+    INCLUDEPATH += $$PWD/../clBLAS/src
+    DEPENDPATH += $$PWD/../clBLAS/src
+}
+
 
 SOURCES += main.cpp \
     ocl.cpp \
@@ -31,7 +44,9 @@ SOURCES += main.cpp \
     matrixell_cpu.cpp \
     matrixcsr_cpu.cpp \
     matrixcsr_gpu.cpp \
-    matrixell_gpu.cpp
+    matrixell_gpu.cpp \
+    matrixhyb_cpu.cpp \
+    matrixhyb_gpu.cpp
 
 HEADERS += ocl.h \
     vector.h \
@@ -42,7 +57,8 @@ HEADERS += ocl.h \
     matrix_types.h \
     mmio.h \
     matrixell.h \
-    matrixcsr.h
+    matrixcsr.h \
+    matrixhyb.h
 
 OTHER_FILES += \
     resources/brief_csr_multip.txt \
@@ -51,14 +67,3 @@ OTHER_FILES += \
     vector_kernels/vector_kernels.cl \
     ell_kernels/ell_matrix_krenels.cl
 
-#DEFINES+= CL_BLAS
-
-#Dependencies from clBlas library
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/release/ -lclBLAS
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/debug/ -lclBLAS
-else:symbian: LIBS += -lclBLAS
-else:unix: LIBS += -L$$PWD/../clBLAS/bin/library/ -lclBLAS
-
-INCLUDEPATH += $$PWD/../clBLAS/src
-DEPENDPATH += $$PWD/../clBLAS/src

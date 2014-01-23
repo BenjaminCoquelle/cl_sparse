@@ -109,10 +109,16 @@ struct s_gMatrixELL {
 };
 
 /// Sparse Matrix - Contains ELL and COO Matrices
-template <typename ValueType, typename IndexType, typename Index = IndexType>
+template <typename ValueType, typename IndexType>
 struct s_MatrixHYB {
   s_MatrixELL<ValueType, IndexType> ELL;
   s_MatrixCOO<ValueType, IndexType> COO;
 };
 
+
+template <typename ValueType, typename IndexType>
+struct s_gMatrixHYB {
+  s_gMatrixELL<ValueType, IndexType> ELL;
+  s_gMatrixCOO<ValueType, IndexType> COO;
+};
 #endif // MATRIX_TYPES_H

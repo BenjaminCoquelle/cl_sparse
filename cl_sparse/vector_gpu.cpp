@@ -1,5 +1,9 @@
 #include "ocl.h"
-#include "clBLAS.h"
+
+#ifdef CL_BLAS
+    #include "clBLAS.h"
+#endif
+
 #include "vector.h"
 
 

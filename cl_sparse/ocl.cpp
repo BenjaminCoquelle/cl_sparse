@@ -1,5 +1,7 @@
 #include "ocl.h"
+#ifdef CL_BLAS
 #include "clBLAS.h"
+#endif
 #include "iostream"
 #include <QStringList>
 
