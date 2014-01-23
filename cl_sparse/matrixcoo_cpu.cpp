@@ -72,6 +72,11 @@ int readline<float>(FILE* f, int&row, int& column, float& v)
     return fscanf(f, "%d %d %g\n", &row, &column, &v);
 }
 
+template<>
+int readline<int>(FILE *f, int &row, int &column,  int &v)
+{
+    return fscanf(f, "%d %d %d\n", &row, &column, &v);
+}
 
 
 template<typename scalar>
@@ -207,6 +212,8 @@ void MatrixCOO<scalar, CPU>::load(const std::string& fname_mtx)
 {
     MM_typecode matcode;
     FILE* f;
+    bool is_integer = false;
+
 
     if ((f = fopen(fname_mtx.c_str(), "r")) == NULL)
     {
@@ -222,7 +229,15 @@ void MatrixCOO<scalar, CPU>::load(const std::string& fname_mtx)
 
     //we support only sparse, matrix in coordinate format
     if (mm_is_matrix(matcode) && mm_is_sparse(matcode) && mm_is_coordinate(matcode) && (mm_is_general(matcode)
-        || mm_is_symmetric(matcode)) && !mm_is_pattern(matcode))  { }
+        || mm_is_symmetric(matcode)) && !mm_is_pattern(matcode))
+    {
+        if (mm_is_integer(matcode))
+        {
+
+            is_integer = true;
+        }
+
+    }
     else
     {
         printf("Error (load (CPU)): Matrix banner: %s is unsupported!\n", mm_typecode_to_str(matcode));
@@ -249,8 +264,23 @@ void MatrixCOO<scalar, CPU>::load(const std::string& fname_mtx)
     //read matrix in coo format
     for (int i = 0; i < nnz; i++)
     {
-        ret_code = readline<scalar>(f, row, column, v);
-        if (ret_code == 0) printf("Warning (load CPU): Problem with reading file at row %d.\n", i);
+        if (is_integer)
+        {
+            //will convert to scalar
+            int iv = 0;
+            ret_code = readline<int>(f, row, column, iv);
+            v = scalar(iv);
+        }
+        else
+        {
+            ret_code = readline<scalar>(f, row, column, v);
+        }
+        if (ret_code == 0)
+        {
+            printf("Warning (load CPU): Problem with reading file %s at row %d (%d).\n", fname_mtx.c_str(), i, ret_code);
+            exit(i);
+        }
+
         //zero based index
         row--;
         column--;

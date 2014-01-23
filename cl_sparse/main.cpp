@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     // =>0 - device_id usually same as nvidia_smi ids.
 
 
-    std::string fmtx = "/media/Storage/matrices/Bell_MTX/cant.mtx"; //orani678.mtx";
+    std::string fmtx = "/media/Storage/matrices/Bell_MTX/webbase-1M.mtx"; //orani678.mtx";
     //std::string fmtx = "/media/Storage/matrices/Bell_MTX/orani678.mtx";
     //std::string fmtx = "/media/Storage/matrices/vampir/pores_1.mtx";
     typedef double scalar;

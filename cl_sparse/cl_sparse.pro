@@ -22,12 +22,12 @@ LIBS +=      -lOpenCL
 
 #Dependencies from clBlas library
 contains(DEFINES, CL_BLAS) {
-    message("Compilation with clBLAS library, make sure that clBLAS is built first")
-    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/release/ -lclBLAS
-    else:unix: LIBS += -L$$PWD/../clBLAS/bin/library/ -lclBLAS
+#    message("Compilation with clBLAS library, make sure that clBLAS is built first")
+#    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../clBLAS/bin/library/release/ -lclBLAS
+#    else:unix: LIBS += -L$$PWD/../clBLAS/bin/library/ -lclBLAS
 
-    INCLUDEPATH += $$PWD/../clBLAS/src
-    DEPENDPATH += $$PWD/../clBLAS/src
+#    INCLUDEPATH += $$PWD/../clBLAS/src
+#    DEPENDPATH += $$PWD/../clBLAS/src
 }
 
 
