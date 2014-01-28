@@ -12,7 +12,7 @@ TARGET = SPMV_OCL
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = lib #app #lib
+TEMPLATE = app #lib #app #lib
 
 INCLUDEPATH += /usr/local/cuda/include \
 

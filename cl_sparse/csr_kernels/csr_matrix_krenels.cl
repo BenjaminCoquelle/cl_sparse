@@ -1,10 +1,9 @@
 #define WARP_SIZE 32
 
 #define ValueType float
-#define IndexType int
-__kernel void s_kernel_csr_spmv_vector(const IndexType num_rows,
-                                     __global const IndexType * row_offset,
-                                     __global const IndexType * col,
+__kernel void s_kernel_csr_spmv_vector(const int num_rows,
+                                     __global const int * row_offset,
+                                     __global const int * col,
                                      __global const ValueType * val,
                                      __global const ValueType * x,
                                      __global ValueType * y,
@@ -44,15 +43,37 @@ __kernel void s_kernel_csr_spmv_vector(const IndexType num_rows,
     }
 }
 
+
+
+__kernel void s_kernel_csr_spmv_scalar ( const int size,
+                                         __global const int* row_offset,
+                                         __global const int* col,
+                                         __global const ValueType* val,
+                                         __global const ValueType* x,
+                                         __global ValueType* y
+                                         )
+{
+
+    int idx = get_global_id(0); //get thread idx
+
+    if (idx >= size)
+        return;
+
+    ValueType suma = 0.0;
+
+    for (int k = row_offset[ idx ]; k < row_offset[idx + 1]; k++)
+        suma += val[ k ] * x [ col[k] ];
+
+    y[ idx ] = suma;
+}
 /**
     Double precision kernels
 */
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #define ValueType double
-#define IndexType int
-__kernel void d_kernel_csr_spmv_vector(const IndexType num_rows,
-                                     __global const IndexType * row_offset,
-                                     __global const IndexType * col,
+__kernel void d_kernel_csr_spmv_vector(const int num_rows,
+                                     __global const int * row_offset,
+                                     __global const int * col,
                                      __global const ValueType * val,
                                      __global const ValueType * x,
                                      __global ValueType * y,
@@ -90,5 +111,27 @@ __kernel void d_kernel_csr_spmv_vector(const IndexType num_rows,
             y[row] = sum;
 
     }
+}
+
+__kernel void d_kernel_csr_spmv_scalar ( const int size,
+                                         __global const int* row_offset,
+                                         __global const int* col,
+                                         __global const ValueType* val,
+                                         __global const ValueType* x,
+                                         __global ValueType* y
+                                         )
+{
+
+    int idx = get_global_id(0); //get thread idx
+
+    if (idx >= size)
+        return;
+
+    ValueType suma = 0.0;
+
+    for (int k = row_offset[ idx ]; k < row_offset[idx + 1]; k++)
+        suma += val[ k ] * x [ col[k] ];
+
+    y[ idx ] = suma;
 }
 #pragma OPENCL EXTENSION cl_khr_fp64 : disable

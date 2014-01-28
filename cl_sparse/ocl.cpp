@@ -508,9 +508,16 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
     kernels["d_kernel_coo_spmv_serial"] = get_kernel(program, "d_kernel_coo_spmv_serial");
 
     //csr matrix
+    //vector kernel
     kernels["s_kernel_csr_spmv_vector"] = get_kernel(program, "s_kernel_csr_spmv_vector");
     kernels["d_kernel_csr_spmv_vector"] = get_kernel(program, "d_kernel_csr_spmv_vector");
 
+    //scalar kernel
+    kernels["s_kernel_csr_spmv_scalar"] = get_kernel(program, "s_kernel_csr_spmv_scalar");
+    kernels["d_kernel_csr_spmv_scalar"] = get_kernel(program, "d_kernel_csr_spmv_scalar");
+
+
+    //ell matrix
     kernels["s_kernel_ell_spmv"] = get_kernel(program, "s_kernel_ell_spmv");
     kernels["d_kernel_ell_spmv"] = get_kernel(program, "d_kernel_ell_spmv");
 

@@ -1,5 +1,5 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : disable
-#define BLOCK_SIZE 128
+#define BLOCK_SIZE 256
 #define WARP_SIZE 32
 #define ValueType float
 
@@ -88,7 +88,7 @@ inline void s_segreduce_block(__local const int *idx, __local ValueType *val) {
 // CHANGELOG
 // - adopted interface
 // ----------------------------------------------------------
-__kernel void s_kernel_coo_spmv_flat(         const       int  num_nonzeros,
+__kernel void s_kernel_coo_spmv_flat(       const       int  num_nonzeros,
                                             const       int  interval_size,
                                    __global const       int *I,
                                    __global const       int *J,
@@ -258,7 +258,7 @@ __kernel void s_kernel_coo_spmv_serial(         const       int  num_entries,
 */
 
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
-#define BLOCK_SIZE 128
+#define BLOCK_SIZE 256
 #define WARP_SIZE 32
 #define ValueType double
 

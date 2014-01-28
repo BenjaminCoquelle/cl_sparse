@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     // =>0 - device_id usually same as nvidia_smi ids.
 
 
-    std::string fmtx = "/media/Storage/matrices/Bell_MTX/webbase-1M.mtx"; //orani678.mtx";
-    //std::string fmtx = "/media/Storage/matrices/Bell_MTX/orani678.mtx";
+    //std::string fmtx = "/media/Storage/matrices/Bell_MTX/webbase-1M.mtx"; //orani678.mtx";
+    std::string fmtx = "/media/Storage/matrices/Bell_MTX/orani678.mtx";
     //std::string fmtx = "/media/Storage/matrices/vampir/pores_1.mtx";
     typedef double scalar;
 
@@ -80,27 +80,27 @@ int main(int argc, char *argv[])
 
 
 
-    MatrixELL<scalar, GPU> ell;
-    ell.load(fmtx);
+//    MatrixELL<scalar, GPU> ell;
+//    ell.load(fmtx);
 
-    b.set(0.0);
-    t.reset();
-    for (int i = 0; i < 50; i++)
-        ell.multiply(x, b);
-    printf("T: %g\n", t.elapsed_seconds()/50);
-    printf("ell b norm %f\n", b.norm());
-    b.save("b_ell_result.txt");
+//    b.set(0.0);
+//    t.reset();
+//    for (int i = 0; i < 50; i++)
+//        ell.multiply(x, b);
+//    printf("T: %g\n", t.elapsed_seconds()/50);
+//    printf("ell b norm %f\n", b.norm());
+//    b.save("b_ell_result.txt");
 
-    MatrixHYB<scalar, GPU> hyb;
-    hyb.load(fmtx);
+//    MatrixHYB<scalar, GPU> hyb;
+//    hyb.load(fmtx);
 
-    b.set(0.0);
-    t.reset();
-    for (int i = 0; i < 50; i++)
-        hyb.multiply(x, b);
-    printf("T: %g\n", t.elapsed_seconds()/50);
-    printf("hyb b norm %f\n", b.norm());
-    b.save("b_hyb_result.txt");
+//    b.set(0.0);
+//    t.reset();
+//    for (int i = 0; i < 50; i++)
+//        hyb.multiply(x, b);
+//    printf("T: %g\n", t.elapsed_seconds()/50);
+//    printf("hyb b norm %f\n", b.norm());
+//    b.save("b_hyb_result.txt");
 
     ocl.shutdown ();
 

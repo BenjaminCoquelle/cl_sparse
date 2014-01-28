@@ -169,30 +169,63 @@ void MatrixCSR<scalar,GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scala
     size_t    localWorkSize[1];
     size_t    globalWorkSize[1];
 
-    //TODO: Tune up those parameters!
-    const int WARP_SIZE = 32;
-    localWorkSize[0] = WARP_SIZE * 8;
-    globalWorkSize[0] = localWorkSize[0] * 128;
+    const scalar avg_nnz_per_row = ((scalar)this->get_nnz())/this->get_nrow();
 
-    Kernel k;
-    if (sizeof(scalar) == 4)
-        k = OpenCL::kernels["s_kernel_csr_spmv_vector"];
+    bool use_scalar = true;
+    if (use_scalar)
+    {
+        //qDebug() << "CRS Multiply: USING SCALAR KERNEL\n";
+
+        localWorkSize[0] = 256;
+        globalWorkSize[0] = localWorkSize[0] * 128;
+
+        Kernel k;
+        if (sizeof(scalar) == 4)
+            k = OpenCL::kernels["s_kernel_csr_spmv_scalar"];
+        else
+            k = OpenCL::kernels["d_kernel_csr_spmv_scalar"];
+        k.set_int(0,    in.get_csize());
+        k.set_buffer(1, this->mat.row_offset);
+        k.set_buffer(2, this->mat.col);
+        k.set_buffer(3, this->mat.val);
+        k.set_buffer(4, in.get_cdata());
+        k.set_buffer(5, out.get_data());
+
+        k.execute(localWorkSize[0], globalWorkSize[0], &ocl_event);
+
+        err = clWaitForEvents( 1, &ocl_event );
+        //printf("csr scalar kernel wait event: %s\n", OpenCL::getError (err).toStdString().c_str());
+
+        err = clReleaseEvent( ocl_event );
+
+    }
     else
-        k = OpenCL::kernels["d_kernel_csr_spmv_vector"];
-    k.set_int(0, this->nrow);
-    k.set_buffer(1, this->mat.row_offset);
-    k.set_buffer(2, this->mat.col);
-    k.set_buffer(3, this->mat.val);
-    k.set_buffer(4, in.get_cdata());
-    k.set_buffer(5, out.get_data());
-    k.set_local(6, (localWorkSize[0]+16)*sizeof(scalar) );
+    {
+        //TODO: Tune up those parameters!
+        const int WARP_SIZE = 32;
+        localWorkSize[0] = WARP_SIZE * 8;
+        globalWorkSize[0] = localWorkSize[0] * 128;
 
-    k.execute(localWorkSize[0], globalWorkSize[0], &ocl_event);
+        Kernel k;
+        if (sizeof(scalar) == 4)
+            k = OpenCL::kernels["s_kernel_csr_spmv_vector"];
+        else
+            k = OpenCL::kernels["d_kernel_csr_spmv_vector"];
+        k.set_int(0, this->nrow);
+        k.set_buffer(1, this->mat.row_offset);
+        k.set_buffer(2, this->mat.col);
+        k.set_buffer(3, this->mat.val);
+        k.set_buffer(4, in.get_cdata());
+        k.set_buffer(5, out.get_data());
+        k.set_local(6, (localWorkSize[0]+16)*sizeof(scalar) );
 
-    err = clWaitForEvents( 1, &ocl_event );
-    //printf("csr kernel wait event: %s\n", OpenCL::getError (err).toStdString().c_str());
+        k.execute(localWorkSize[0], globalWorkSize[0], &ocl_event);
 
-    err = clReleaseEvent( ocl_event );
+        err = clWaitForEvents( 1, &ocl_event );
+        //printf("csr kernel wait event: %s\n", OpenCL::getError (err).toStdString().c_str());
+
+        err = clReleaseEvent( ocl_event );
+    }
 
 }
 
