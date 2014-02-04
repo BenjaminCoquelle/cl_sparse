@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 
     qDebug() << " Remember to export libs: LD_LIBRARY_PATH=../cl_sparse/:../../clsparse/clBLAS/bin/library/ ";
    // VectorTest vt;
-    VectorBenchmark vb;
+   // VectorBenchmark vb;
     MatrixBenchmark mb;
 
 

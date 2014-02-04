@@ -4,10 +4,8 @@
 #include <QObject>
 #include "ocl.h"
 #include "vector.h"
-#include "matrixcoo.h"
-#include "matrixcsr.h"
-#include "matrixell.h"
-#include "matrixhyb.h"
+#include "matrix.h"
+
 
 class MatrixBenchmark : public QObject
 {
@@ -47,6 +45,9 @@ private Q_SLOTS:
 
     void bench_Test_CSR_float();
     void bench_Test_CSR_float_data();
+
+    void bench_Test_CSR_float2();
+    void bench_Test_CSR_float2_data();
 
     void bench_Test_ELL_float();
     void bench_Test_ELL_float_data();

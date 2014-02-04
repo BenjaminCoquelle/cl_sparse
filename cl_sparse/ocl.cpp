@@ -240,7 +240,8 @@ OpenCL::Device OpenCL::get_device(cl_device_id device_id)
     clGetDeviceInfo(d.id, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(d.local_mem_size), &(d.local_mem_size), NULL);
     clGetDeviceInfo(d.id, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(d.total_mem_size), &(d.total_mem_size), NULL);
     clGetDeviceInfo(d.id, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, sizeof(d.ui_support_double), &(d.ui_support_double), NULL);
-
+    clGetDeviceInfo(d.id, CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(d.max_2d_width), &(d.max_2d_width), NULL);
+    clGetDeviceInfo(d.id, CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(d.max_2d_height), &(d.max_2d_height), NULL);
     if (d.ui_support_double ==0)
         d.supportDouble = false;
     else
@@ -515,6 +516,10 @@ void OpenCL::build_program(const QList<std::string>& kernels_list)
     //scalar kernel
     kernels["s_kernel_csr_spmv_scalar"] = get_kernel(program, "s_kernel_csr_spmv_scalar");
     kernels["d_kernel_csr_spmv_scalar"] = get_kernel(program, "d_kernel_csr_spmv_scalar");
+
+    //kernel with tex
+    kernels["s_kernel_test"] = get_kernel(program,  "s_kernel_test");
+    kernels["s_kernel_test2"] = get_kernel(program,  "s_kernel_test2");
 
 
     //ell matrix

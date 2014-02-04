@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    cl_sparse \
-    testing
+    cl_sparse
+    #testing

@@ -65,6 +65,11 @@ void MatrixBenchmark::bench_Test_CSR_float_data()
     generate_data();
 }
 
+void MatrixBenchmark::bench_Test_CSR_float2_data()
+{
+    generate_data();
+}
+
 void MatrixBenchmark::bench_Test_ELL_float_data()
 {
     generate_data();
@@ -132,7 +137,7 @@ void MatrixBenchmark::bench_Test_CSR_float()
     QFETCH(QString, matrix_path);
 
     csr_float = new MatrixCSR<scalar, GPU>();
-    csr_float->load(matrix_path.toStdString());
+    csr_float->load(matrix_path.toStdString(), CL_MEM_READ_WRITE);
 
 
     Vector<scalar, GPU> x(csr_float->get_ncol(), 1.0);
@@ -141,10 +146,28 @@ void MatrixBenchmark::bench_Test_CSR_float()
     QBENCHMARK {
         csr_float->multiply(x,b);
     }
-    //qDebug() << b.norm();
+    qDebug() << b.norm();
     delete csr_float;
 }
 
+void MatrixBenchmark::bench_Test_CSR_float2()
+{
+    typedef float scalar;
+    QFETCH(QString, matrix_path);
+
+    csr_float = new MatrixCSR<scalar, GPU>();
+    csr_float->load(matrix_path.toStdString(), CL_MEM_READ_ONLY);
+
+
+    Vector<scalar, GPU> x(csr_float->get_ncol(), 1.0, CL_MEM_READ_ONLY);
+    Vector<scalar, GPU> b(csr_float->get_nrow(), 0.0, CL_MEM_WRITE_ONLY);
+
+    QBENCHMARK {
+        csr_float->multiply(x,b);
+    }
+    qDebug() << b.norm();
+    delete csr_float;
+}
 
 void MatrixBenchmark::bench_Test_ELL_float()
 {

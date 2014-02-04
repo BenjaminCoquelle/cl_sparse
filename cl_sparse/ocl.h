@@ -69,6 +69,8 @@ private:
         cl_ulong            max_alloc_size;
         cl_ulong            local_mem_size;
         cl_ulong            total_mem_size;
+        size_t              max_2d_width;
+        size_t              max_2d_height;
 
         cl_uint             ui_support_double;
         bool                supportDouble;
@@ -91,6 +93,8 @@ private:
             info << "\tMax alloc size: " << float(max_alloc_size*9.53674316*1e-7) << " MB"<< std::endl;
             info << "\tLocal mem size: " << float(local_mem_size*9.53674316*1e-7) << " MB" << std::endl;
             info << "\tTotal mem size: " << float(total_mem_size*9.53674316*1e-7) << " MB" << std::endl;
+            info << "\t2D image max widht: " << max_2d_width << std::endl;
+            info << "\t2D image max height: " << max_2d_height<< std::endl;
 
             info << "\tSupport double precision: " << supportDouble << std::endl;
 
