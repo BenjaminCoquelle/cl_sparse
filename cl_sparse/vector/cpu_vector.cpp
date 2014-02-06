@@ -43,6 +43,18 @@ Vector<scalar, CPU>::Vector(int size, const scalar* data)
 }
 
 template<typename scalar>
+Vector<scalar, CPU>::Vector(const int begin, const int end, const int size)
+{
+    //const int range = end - begin;
+    this->size = size;
+    this->data = new scalar [size];
+
+    int value = begin;
+    for (int i = 0; i < size; i++)
+        this->data[i] = value++;
+}
+
+template<typename scalar>
 Vector<scalar, CPU>::Vector(const Vector& other)
 {
     this->size = other.size;
@@ -246,14 +258,20 @@ template<typename scalar>
 const scalar& Vector<scalar, CPU>::operator[] (int i) const
 {
     assert (i < size);
-    if(i < size)
+    if(i < size) //this only for debug information. exclude it in release
         return this->data[i];
     else
         qDebug() << "Vector (CPU) []: index out of range i=" << i << " size=" << size;
 
 }
 
+template<typename scalar>
+scalar& Vector<scalar, CPU>::operator[] (int i )
+{
+    assert (i < size);
+    return this->data[i];
 
+}
 
 template<typename scalar>
 void Vector<scalar, CPU>::set(scalar value)
@@ -268,7 +286,7 @@ int Vector<scalar, CPU>::get_size() const
 }
 
 template<typename scalar>
-int const Vector<scalar, CPU>::get_csize() const
+int Vector<scalar, CPU>::get_csize() const
 {
     return size;
 }
@@ -280,9 +298,25 @@ scalar* Vector<scalar, CPU>::get_data()
 }
 
 template<typename scalar>
-scalar const* Vector<scalar, CPU>::get_cdata() const
+scalar* Vector<scalar, CPU>::get_cdata() const
 {
     return data;
+}
+
+template<typename scalar>
+void Vector<scalar, CPU>::resize(const int n)
+{
+    if (this->size != n)
+    {
+        scalar* new_data = new scalar [n];
+        if (this->size != 0)
+        {
+            memcpy(new_data, this->data, n*sizeof(scalar));
+            delete [] this->data;
+        }
+        this->size = n;
+        this->data = new_data;
+    }
 }
 
 template<typename scalar>
@@ -413,6 +447,20 @@ void Vector<scalar, CPU>::load(std::string fname)
 
     this->size = vector.size();
     memcpy(this->get_data(), vector.data(), this->size*sizeof(scalar));
+}
+
+template<typename scalar>
+void Vector<scalar, CPU>::set_pointerData(scalar* ptr, const int size)
+{
+    this->data = ptr;
+    this->size = size;
+}
+
+template<typename scalar>
+void Vector<scalar, CPU>::release_pointerData()
+{
+    this->data = NULL;
+    this->size = 0;
 }
 
 template<typename scalar>

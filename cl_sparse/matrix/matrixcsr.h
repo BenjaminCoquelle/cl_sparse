@@ -38,9 +38,9 @@ public:
 
     ~MatrixCSR();
 
-    int const get_nnz()const;
-    int const get_nrow()const;
-    int const get_ncol()const;
+    int get_nnz()const;
+    int get_nrow()const;
+    int get_ncol()const;
 
     double get_troughput(const double& time);
 
@@ -83,13 +83,13 @@ public:
 
     ~MatrixCSR();
 
-    int const get_nnz()const;
-    int const get_nrow()const;
-    int const get_ncol()const;
+    int get_nnz()  const;
+    int get_nrow() const;
+    int get_ncol() const;
 
-    scalar* const get_valPtr() const;
-    int* const get_rowPtr() const;
-    int* const get_colPtr() const;
+    scalar* get_valPtr() const;
+    int* get_rowPtr() const;
+    int* get_colPtr() const;
 
     double get_troughput(const double& time);
 
@@ -136,13 +136,13 @@ public:
 
     ~MatrixCSR();
 
-    int const get_nnz()const;
-    int const get_nrow()const;
-    int const get_ncol()const;
+    int get_nnz()  const;
+    int get_nrow() const;
+    int get_ncol() const;
 
-    cl_mem const get_valPtr() const;
-    cl_mem const get_rowPtr() const;
-    cl_mem const get_colPtr() const;
+    cl_mem get_valPtr() const;
+    cl_mem get_rowPtr() const;
+    cl_mem get_colPtr() const;
 
     double get_troughput(const double& time);
 

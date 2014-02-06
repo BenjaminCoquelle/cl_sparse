@@ -96,37 +96,37 @@ void MatrixCOO<scalar, GPU>::clear()
 }
 
 template<typename scalar>
-const int MatrixCOO<scalar, GPU>::get_nnz() const
+int MatrixCOO<scalar, GPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template<typename scalar>
-const int MatrixCOO<scalar, GPU>::get_nrow() const
+int MatrixCOO<scalar, GPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template<typename scalar>
-const int MatrixCOO<scalar, GPU>::get_ncol() const
+int MatrixCOO<scalar, GPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template<typename scalar>
-cl_mem const MatrixCOO<scalar, GPU>::get_rowPtr() const
+cl_mem MatrixCOO<scalar, GPU>::get_rowPtr() const
 {
     return this->mat.row;
 }
 
 template<typename scalar>
-cl_mem const MatrixCOO<scalar, GPU>::get_colPtr() const
+cl_mem MatrixCOO<scalar, GPU>::get_colPtr() const
 {
     return this->mat.col;
 }
 
 template<typename scalar>
-cl_mem const MatrixCOO<scalar, GPU>::get_valPtr() const
+cl_mem MatrixCOO<scalar, GPU>::get_valPtr() const
 {
     return this->mat.val;
 }

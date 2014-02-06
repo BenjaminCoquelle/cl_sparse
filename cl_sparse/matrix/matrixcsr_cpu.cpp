@@ -115,7 +115,7 @@ void MatrixCSR<scalar, CPU>::save(const std::string &fname_mtx)
 
 
 template<typename scalar>
-int const MatrixCSR<scalar, CPU>::get_nnz() const
+int MatrixCSR<scalar, CPU>::get_nnz() const
 {
     return this->nnz;
 }
@@ -123,33 +123,33 @@ int const MatrixCSR<scalar, CPU>::get_nnz() const
 
 
 template<typename scalar>
-int const MatrixCSR<scalar, CPU>::get_nrow() const
+int MatrixCSR<scalar, CPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 
 template<typename scalar>
-int const MatrixCSR<scalar, CPU>::get_ncol() const
+int MatrixCSR<scalar, CPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 
 template<typename scalar>
-scalar* const MatrixCSR<scalar, CPU>::get_valPtr() const
+scalar* MatrixCSR<scalar, CPU>::get_valPtr() const
 {
     return this->mat.val;
 }
 
 template<typename scalar>
-int* const MatrixCSR<scalar, CPU>::get_rowPtr() const
+int* MatrixCSR<scalar, CPU>::get_rowPtr() const
 {
     return this->mat.row_offset;
 }
 
 template<typename scalar>
-int* const MatrixCSR<scalar, CPU>::get_colPtr() const
+int* MatrixCSR<scalar, CPU>::get_colPtr() const
 {
     return this->mat.col;
 }

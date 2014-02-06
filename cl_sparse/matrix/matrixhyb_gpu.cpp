@@ -378,68 +378,68 @@ void MatrixHYB<scalar, GPU>::multiply(const Vector<scalar, GPU> &in, Vector<scal
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, GPU>::get_nnz() const
+int MatrixHYB<scalar, GPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, GPU>::get_ncol() const
+int MatrixHYB<scalar, GPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, GPU>::get_nrow() const
+int MatrixHYB<scalar, GPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar,GPU>::get_ell_max_row() const
+int MatrixHYB<scalar,GPU>::get_ell_max_row() const
 {
     return this->mat.ELL.max_row;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, GPU>::get_ell_nnz() const
+int MatrixHYB<scalar, GPU>::get_ell_nnz() const
 {
     return this->ell_nnz;
 }
 
 template <typename scalar>
-int const MatrixHYB<scalar, GPU>::get_coo_nnz() const
+int MatrixHYB<scalar, GPU>::get_coo_nnz() const
 {
     return this->coo_nnz;
 }
 
 
 template<typename scalar>
-cl_mem const MatrixHYB<scalar, GPU>::get_ellColPtr() const
+cl_mem MatrixHYB<scalar, GPU>::get_ellColPtr() const
 {
     return this->mat.ELL.col;
 }
 
 template<typename scalar>
-cl_mem const MatrixHYB<scalar, GPU>::get_ellValPtr() const
+cl_mem MatrixHYB<scalar, GPU>::get_ellValPtr() const
 {
     return this->mat.ELL.val;
 }
 
 template<typename scalar>
-cl_mem const MatrixHYB<scalar, GPU>::get_cooColPtr() const
+cl_mem MatrixHYB<scalar, GPU>::get_cooColPtr() const
 {
     return this->mat.COO.col;
 }
 
 template<typename scalar>
-cl_mem const MatrixHYB<scalar, GPU>::get_cooRowPtr() const
+cl_mem MatrixHYB<scalar, GPU>::get_cooRowPtr() const
 {
     return this->mat.COO.row;
 }
 
 template<typename scalar>
-cl_mem const MatrixHYB<scalar, GPU>::get_cooValPtr() const
+cl_mem MatrixHYB<scalar, GPU>::get_cooValPtr() const
 {
     return this->mat.COO.val;
 }

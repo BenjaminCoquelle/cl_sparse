@@ -16,6 +16,7 @@ public:
     Vector(int size);
     Vector(int size, scalar value);
     explicit Vector(int size, const scalar* data);
+    explicit Vector(const int begin, const int end, const int size); //size added to distinct between other constr;
     Vector(const Vector& other);
 
     Vector& operator= (const Vector& other);
@@ -44,14 +45,17 @@ public:
 
 
     const scalar& operator[] (int i) const;
+    scalar& operator[] (int i);
 
     // get size of the vector
-    int     get_size() const;
-    int const get_csize() const;
+    int     get_size()  const;
+    int     get_csize() const;
     // get pointer to data array
     scalar* get_data();
     // get const pointer to data array
-    scalar const * get_cdata() const;
+    scalar* get_cdata() const;
+
+    void resize(const int n);
 
     //dot product with other vector
     scalar  dot(const Vector& other);
@@ -69,6 +73,10 @@ public:
     //save to flat file
     void    save(std::string fname);
     void    load(std::string fname);
+
+    void set_pointerData(scalar* ptr, const int size);
+    void release_pointerData();
+
     ~Vector();
 
 private:

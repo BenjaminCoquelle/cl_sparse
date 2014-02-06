@@ -88,7 +88,7 @@ void MatrixCSR<scalar, GPU>::allocate(const int nnz, const int nrow, const int n
 }
 
 template<typename scalar>
-int const MatrixCSR<scalar, GPU>::get_nnz() const
+int MatrixCSR<scalar, GPU>::get_nnz() const
 {
     return this->nnz;
 }
@@ -96,33 +96,33 @@ int const MatrixCSR<scalar, GPU>::get_nnz() const
 
 
 template<typename scalar>
-int const MatrixCSR<scalar, GPU>::get_nrow() const
+int MatrixCSR<scalar, GPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 
 template<typename scalar>
-int const MatrixCSR<scalar, GPU>::get_ncol() const
+int MatrixCSR<scalar, GPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 
 template<typename scalar>
-cl_mem const MatrixCSR<scalar, GPU>::get_valPtr() const
+cl_mem MatrixCSR<scalar, GPU>::get_valPtr() const
 {
     return this->mat.val;
 }
 
 template<typename scalar>
-cl_mem const MatrixCSR<scalar, GPU>::get_rowPtr() const
+cl_mem MatrixCSR<scalar, GPU>::get_rowPtr() const
 {
     return this->mat.row_offset;
 }
 
 template<typename scalar>
-cl_mem const MatrixCSR<scalar, GPU>::get_colPtr() const
+cl_mem MatrixCSR<scalar, GPU>::get_colPtr() const
 {
     return this->mat.col;
 }
@@ -164,12 +164,13 @@ void MatrixCSR<scalar,GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scala
     //const int nnz_per_row = get_nnz() / get_nrow();
     //printf("nnz_per_row: %d\n", nnz_per_row);
 
-    cl_int    err;
+
     cl_event  ocl_event;
     size_t    localWorkSize[1];
     size_t    globalWorkSize[1];
 
-    const scalar avg_nnz_per_row = ((scalar)this->get_nnz())/this->get_nrow();
+    //USE IT TO DECIDE SCALAR OR VECTOR
+    //const scalar avg_nnz_per_row = ((scalar)this->get_nnz())/this->get_nrow();
 
 
     if (use_scalar)
@@ -193,7 +194,7 @@ void MatrixCSR<scalar,GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scala
 
         k.execute(localWorkSize[0], globalWorkSize[0], &ocl_event);
 
-        err = clWaitForEvents( 1, &ocl_event );
+        cl_int err = clWaitForEvents( 1, &ocl_event );
         //printf("csr scalar kernel wait event: %s\n", OpenCL::getError (err).toStdString().c_str());
 
         err = clReleaseEvent( ocl_event );
@@ -221,7 +222,7 @@ void MatrixCSR<scalar,GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scala
 
         k.execute(localWorkSize[0], globalWorkSize[0], &ocl_event);
 
-        err = clWaitForEvents( 1, &ocl_event );
+        cl_int err = clWaitForEvents( 1, &ocl_event );
         //printf("csr kernel wait event: %s\n", OpenCL::getError (err).toStdString().c_str());
 
         err = clReleaseEvent( ocl_event );
@@ -288,8 +289,6 @@ void MatrixCSR<scalar,GPU>::test2(const Vector<scalar, GPU>& in, Vector<scalar, 
 template<typename scalar>
 void MatrixCSR<scalar,GPU>::test1(const Vector<scalar, GPU>& in, Vector<scalar, GPU>& out, cl_mem devTexVec)
 {
-
-
 
     cl_int    err;
     cl_event  ocl_event;

@@ -34,13 +34,13 @@ public:
     void allocate(const int ell_nnz, const int coo_nnz, const int ell_max_row,
                   const int nrow, const int ncol);
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
+    int get_nnz() const;
+    int get_nrow() const;
+    int get_ncol() const;
 
-    int const get_ell_max_row() const;
-    int const get_ell_nnz() const;
-    int const get_coo_nnz() const;
+    int get_ell_max_row() const;
+    int get_ell_nnz() const;
+    int get_coo_nnz() const;
 
 
 
@@ -76,21 +76,21 @@ public:
     void allocate(const int ell_nnz, const int coo_nnz, const int ell_max_row,
                   const int nrow, const int ncol);
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
+    int get_nnz() const;
+    int get_nrow() const;
+    int get_ncol() const;
 
 
-    int const get_ell_max_row() const;
-    int const get_ell_nnz() const;
-    int const get_coo_nnz() const;
+    int get_ell_max_row() const;
+    int get_ell_nnz() const;
+    int get_coo_nnz() const;
 
-    int* const get_ellColPtr() const;
-    scalar* const get_ellValPtr() const;
+    int* get_ellColPtr() const;
+    scalar* get_ellValPtr() const;
 
-    int* const get_cooColPtr() const;
-    int* const get_cooRowPtr() const;
-    scalar* const get_cooValPtr() const;
+    int* get_cooColPtr() const;
+    int* get_cooRowPtr() const;
+    scalar* get_cooValPtr() const;
 
     //from csr -> hyb
     void get_data(const MatrixCSR<scalar, CPU>& matrix);
@@ -128,20 +128,20 @@ public:
     void allocate(const int ell_nnz, const int coo_nnz, const int ell_max_row,
                   const int nrow, const int ncol);
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
+    int get_nnz() const;
+    int get_nrow() const;
+    int get_ncol() const;
 
-    int const get_ell_max_row() const;
-    int const get_ell_nnz() const;
-    int const get_coo_nnz() const;
+    int get_ell_max_row() const;
+    int get_ell_nnz() const;
+    int get_coo_nnz() const;
 
-    cl_mem const get_ellColPtr() const;
-    cl_mem const get_ellValPtr() const;
+    cl_mem get_ellColPtr() const;
+    cl_mem get_ellValPtr() const;
 
-    cl_mem const get_cooColPtr() const;
-    cl_mem const get_cooRowPtr() const;
-    cl_mem const get_cooValPtr() const;
+    cl_mem get_cooColPtr() const;
+    cl_mem get_cooRowPtr() const;
+    cl_mem get_cooValPtr() const;
 
     void multiply(const Vector<scalar, GPU>& in, Vector<scalar, GPU>& out );
 private:

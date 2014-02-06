@@ -68,37 +68,37 @@ void MatrixELL<scalar, CPU>::allocate(const int nnz, const int nrow, const int n
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, CPU>::get_nnz() const
+int MatrixELL<scalar, CPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, CPU>::get_nrow() const
+int MatrixELL<scalar, CPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, CPU>::get_ncol() const
+int MatrixELL<scalar, CPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, CPU>::get_max_row() const
+int MatrixELL<scalar, CPU>::get_max_row() const
 {
     return this->mat.max_row;
 }
 
 template <typename scalar>
-int* const MatrixELL<scalar, CPU>::get_colPtr() const
+int* MatrixELL<scalar, CPU>::get_colPtr() const
 {
     return this->mat.col;
 }
 
 template <typename scalar>
-scalar* const MatrixELL<scalar, CPU>::get_valPtr() const
+scalar* MatrixELL<scalar, CPU>::get_valPtr() const
 {
     return this->mat.val;
 }

@@ -564,7 +564,7 @@ cl_mem Vector<scalar, GPU>::get_data()
 }
 
 template<typename scalar>
-cl_mem const Vector<scalar, GPU>::get_cdata() const
+cl_mem Vector<scalar, GPU>::get_cdata() const
 {
     return data;
 }
@@ -576,7 +576,7 @@ int Vector<scalar, GPU>::get_size()
 }
 
 template<typename scalar>
-int const Vector<scalar, GPU>::get_csize() const
+int Vector<scalar, GPU>::get_csize() const
 {
     return size;
 }

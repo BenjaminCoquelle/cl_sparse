@@ -52,10 +52,10 @@ public:
     //void scale(const cl_mem alpha);
 
     int     get_size();
-    int const get_csize() const;
+    int     get_csize() const;
 
     cl_mem  get_data();
-    cl_mem const get_cdata() const;
+    cl_mem  get_cdata() const;
 
 
     //dot product with other vector - result to cpu

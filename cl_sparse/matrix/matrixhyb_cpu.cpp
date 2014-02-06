@@ -254,67 +254,67 @@ void MatrixHYB<scalar, CPU>::multiply(const Vector<scalar, CPU> &in, Vector<scal
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, CPU>::get_nnz() const
+int MatrixHYB<scalar, CPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, CPU>::get_ncol() const
+int MatrixHYB<scalar, CPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, CPU>::get_nrow() const
+int MatrixHYB<scalar, CPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar,CPU>::get_ell_max_row() const
+int MatrixHYB<scalar,CPU>::get_ell_max_row() const
 {
     return this->mat.ELL.max_row;
 }
 
 template<typename scalar>
-int const MatrixHYB<scalar, CPU>::get_ell_nnz() const
+int MatrixHYB<scalar, CPU>::get_ell_nnz() const
 {
     return this->ell_nnz;
 }
 
 template <typename scalar>
-int const MatrixHYB<scalar, CPU>::get_coo_nnz() const
+int MatrixHYB<scalar, CPU>::get_coo_nnz() const
 {
     return this->coo_nnz;
 }
 
 template<typename scalar>
-int* const MatrixHYB<scalar, CPU>::get_ellColPtr() const
+int* MatrixHYB<scalar, CPU>::get_ellColPtr() const
 {
     return this->mat.ELL.col;
 }
 
 template<typename scalar>
-scalar* const MatrixHYB<scalar, CPU>::get_ellValPtr() const
+scalar* MatrixHYB<scalar, CPU>::get_ellValPtr() const
 {
     return this->mat.ELL.val;
 }
 
 template<typename scalar>
-int * const MatrixHYB<scalar, CPU>::get_cooColPtr() const
+int * MatrixHYB<scalar, CPU>::get_cooColPtr() const
 {
     return this->mat.COO.col;
 }
 
 template<typename scalar>
-int* const MatrixHYB<scalar, CPU>::get_cooRowPtr() const
+int* MatrixHYB<scalar, CPU>::get_cooRowPtr() const
 {
     return this->mat.COO.row;
 }
 
 template<typename scalar>
-scalar* const MatrixHYB<scalar, CPU>::get_cooValPtr() const
+scalar* MatrixHYB<scalar, CPU>::get_cooValPtr() const
 {
     return this->mat.COO.val;
 }

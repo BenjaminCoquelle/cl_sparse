@@ -32,10 +32,10 @@ public:
 
     ~MatrixELL();
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
-    int const get_max_row() const;
+    int get_nnz()  const;
+    int get_nrow() const;
+    int get_ncol() const;
+    int get_max_row() const;
 
 
 
@@ -77,14 +77,14 @@ public:
 
     ~MatrixELL();
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
-    int const get_max_row() const;
+    int get_nnz() const;
+    int get_nrow() const;
+    int get_ncol() const;
+    int get_max_row() const;
 
     //get pointers;
-    scalar* const get_valPtr() const;
-    int* const get_colPtr() const;
+    scalar* get_valPtr() const;
+    int* get_colPtr() const;
 
     double get_troughput(const double& time);
 
@@ -128,14 +128,14 @@ public:
 
     ~MatrixELL();
 
-    int const get_nnz() const;
-    int const get_nrow() const;
-    int const get_ncol() const;
-    int const get_max_row() const;
+    int get_nnz() const;
+    int get_nrow() const;
+    int get_ncol() const;
+    int get_max_row() const;
 
     //get pointers;
-    cl_mem const get_valPtr() const;
-    cl_mem const get_colPtr() const;
+    cl_mem get_valPtr() const;
+    cl_mem get_colPtr() const;
 
     double get_troughput(const double& time);
 

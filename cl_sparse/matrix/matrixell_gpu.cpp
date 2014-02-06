@@ -69,37 +69,37 @@ void MatrixELL<scalar, GPU>::allocate(const int nnz, const int nrow, const int n
 
 
 template <typename scalar>
-int const MatrixELL<scalar, GPU>::get_nnz() const
+int MatrixELL<scalar, GPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, GPU>::get_nrow() const
+int MatrixELL<scalar, GPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, GPU>::get_ncol() const
+int MatrixELL<scalar, GPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template <typename scalar>
-int const MatrixELL<scalar, GPU>::get_max_row() const
+int MatrixELL<scalar, GPU>::get_max_row() const
 {
     return this->mat.max_row;
 }
 
 template <typename scalar>
-cl_mem const MatrixELL<scalar, GPU>::get_colPtr() const
+cl_mem MatrixELL<scalar, GPU>::get_colPtr() const
 {
     return this->mat.col;
 }
 
 template <typename scalar>
-cl_mem const MatrixELL<scalar, GPU>::get_valPtr() const
+cl_mem MatrixELL<scalar, GPU>::get_valPtr() const
 {
     return this->mat.val;
 }

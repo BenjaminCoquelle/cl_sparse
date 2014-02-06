@@ -149,9 +149,9 @@ void MatrixCOO<scalar, CPU>::clear()
 {
     if(this->get_nnz() > 0)
     {
-        free(mat.row);
-        free(mat.col);
-        free(mat.val);
+        delete [] mat.row;
+        delete [] mat.col;
+        delete [] mat.val;
 
         this->mat.row = NULL;
         this->mat.col = NULL;
@@ -166,37 +166,37 @@ void MatrixCOO<scalar, CPU>::clear()
 
 
 template<typename scalar>
-int const MatrixCOO<scalar, CPU>::get_nnz() const
+int MatrixCOO<scalar, CPU>::get_nnz() const
 {
     return this->nnz;
 }
 
 template<typename scalar>
-int const MatrixCOO<scalar, CPU>::get_nrow() const
+int MatrixCOO<scalar, CPU>::get_nrow() const
 {
     return this->nrow;
 }
 
 template<typename scalar>
-int const MatrixCOO<scalar, CPU>::get_ncol() const
+int MatrixCOO<scalar, CPU>::get_ncol() const
 {
     return this->ncol;
 }
 
 template<typename scalar>
-int* const MatrixCOO<scalar, CPU>::get_rowPtr() const
+int* MatrixCOO<scalar, CPU>::get_rowPtr() const
 {
     return this->mat.row;
 }
 
 template<typename scalar>
-int* const MatrixCOO<scalar, CPU>::get_colPtr() const
+int* MatrixCOO<scalar, CPU>::get_colPtr() const
 {
     return this->mat.col;
 }
 
 template<typename scalar>
-scalar* const MatrixCOO<scalar, CPU>::get_valPtr() const
+scalar* MatrixCOO<scalar, CPU>::get_valPtr() const
 {
     return this->mat.val;
 }
@@ -205,6 +205,51 @@ template<typename scalar>
 void MatrixCOO<scalar, CPU>::info()
 {
     printf("\n\tCPU Matrix, rows: %d, cols: %d, vals: %d\n", get_nrow(), get_ncol(), get_nnz());
+}
+
+template<typename scalar>
+void MatrixCOO<scalar, CPU>::resize(const int nrow, const int ncol, const int nnz)
+{
+    this->nrow = nrow;
+    this->ncol = ncol;
+
+    // matrix arrays changes only if nnz changes!
+    if (nnz != this->nnz )
+    {
+        //values
+        scalar* new_val = new scalar [nnz];
+
+        if (this->nnz != 0)
+        {
+            memcpy(new_val, this->mat.val, nnz*sizeof(scalar));
+            delete [] this->mat.val;
+        }
+
+        this->nnz = nnz;
+        this->mat.val = new_val;
+
+        //col
+        int* new_col = new int [nnz];
+
+        if (this->nnz != 0)
+        {
+            memcpy(new_col, this->mat.col, nnz*sizeof(int));
+            delete [] this->mat.col;
+        }
+
+        this->mat.col = new_col;
+
+        //row
+        int* new_row = new int [nnz];
+        if (this->nnz != 0)
+        {
+            memcpy(new_row, this->mat.row, nnz*sizeof(int));
+            delete [] this->mat.row;
+        }
+
+        this->mat.row = new_row;
+
+    }
 }
 
 template<typename scalar>

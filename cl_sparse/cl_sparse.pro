@@ -47,7 +47,11 @@ SOURCES += main.cpp \
     vector/ocl_vector.cpp \
     vector/cpu_vector.cpp \
     utils/scatter.cpp \
-    iterator.cpp
+    iterator.cpp \
+    utils/matrix_utils.cpp \
+    utils/gather.cpp \
+    utils/scan.cpp \
+    utils/transform.cpp
 
 HEADERS += ocl.h \
     vector.h \
@@ -64,7 +68,11 @@ HEADERS += ocl.h \
     vector/cpu_vector.h \
     matrix.h \
     utils/scatter.h \
-    iterator.h
+    iterator.h \
+    utils/matrix_utils.h \
+    utils/gather.h \
+    utils/scan.h \
+    utils/transform.h
 
 OTHER_FILES += \
     resources/brief_csr_multip.txt \
