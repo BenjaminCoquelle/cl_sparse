@@ -9,6 +9,7 @@
 #include "utils/matrix_utils.h"
 #include "utils/scan.h"
 #include "utils/transform.h"
+#include "utils/reduce.h"
 
 template<typename scalar>
 void vector_tests();
@@ -88,14 +89,14 @@ void coo_spmm_helper(int workspace_size,
 //                       A_gather_locations.begin() - output_ptr[begin_segment]);
     scatter_if(begin_segment, end_segment, in_segment, output_ptr, segment_lengths, A_gather_locations, output_ptr[begin_segment]);
     printf("A_gather_locations after scatter if\n");
-    for (IndexType i = A_gather_locations.get_size()-10; i < A_gather_locations.get_size(); i++)
+    for (IndexType i = 0; i < A_gather_locations.get_size(); i++)
         printf("\ti:%d = %d\n", i, A_gather_locations[i]);
 
 
 
     inclusive_scan_max(0, A_gather_locations.get_csize(), A_gather_locations, A_gather_locations);
     printf("A_gather_locations after inclusive scan\n");
-    for (int i = A_gather_locations.get_size() - 10; i < A_gather_locations.get_size(); i++)
+    for (int i = 0; i < A_gather_locations.get_size(); i++)
         printf("\ti:%d = %d\n", i, A_gather_locations[i]);
 
     B_gather_locations.set(1);
@@ -107,7 +108,7 @@ void coo_spmm_helper(int workspace_size,
                         B_gather_locations, output_ptr[begin_segment]); //tutaj jest problem bo shift powinien być przeunięty o output_ptr[begin_segment]
     A_column_indices.release_pointerData();
     printf("B_gather_locations after scatter if permutted \n");
-    for( IndexType i = B_gather_locations.get_size() - 10; i < B_gather_locations.get_size(); i++)
+    for( IndexType i = 0; i < B_gather_locations.get_size(); i++)
         printf("\ti:%d = %d\n", i, B_gather_locations[i]);
 
     //inplace
@@ -117,7 +118,7 @@ void coo_spmm_helper(int workspace_size,
                           B_gather_locations);//output
 
     printf("B_gather_locations after inclusive scan by key\n");
-    for( IndexType i = B_gather_locations.get_size() - 10; i < B_gather_locations.get_size(); i++)
+    for( IndexType i = 0; i < B_gather_locations.get_size(); i++)
         printf("\ti:%d = %d\n", i, B_gather_locations[i]);
 
 
@@ -130,7 +131,7 @@ void coo_spmm_helper(int workspace_size,
            A_gather_locations,
            I);
     printf("I: \n");
-    for( IndexType i = I.get_size() - 10; i < I.get_size(); i++)
+    for( IndexType i = 0; i < I.get_size(); i++)
         printf("\ti:%d = %d\n", i, I[i]);
     A_row_indices.release_pointerData();
 
@@ -141,7 +142,7 @@ void coo_spmm_helper(int workspace_size,
            B_gather_locations,
            J);
     printf("J:\n");
-    for( IndexType i = J.get_size() - 10; i < J.get_size(); i++)
+    for( IndexType i = 0; i < J.get_size(); i++)
         printf("\ti:%d = %d\n", i, J[i]);
     B_column_indices.release_pointerData();
 
@@ -158,7 +159,7 @@ void coo_spmm_helper(int workspace_size,
 
     printf("V:\n");
 
-    for( IndexType i = V.get_size() - 10; i < V.get_size(); i++)
+    for( IndexType i = 0; i < V.get_size(); i++)
         printf("\ti:%d = %f\n", i, V[i]);
 
     Avalues.release_pointerData();
@@ -166,14 +167,19 @@ void coo_spmm_helper(int workspace_size,
 
     sort_by_row_and_column(I, J, V);
 
-    for (int i = V.get_size() - 25; i < V.get_size(); i++)
+    for (int i = 0; i < V.get_size(); i++)
         printf ("%d: %d, %d, %f\n", i, I[i], J[i], V[i]);
-
+    I.get_data();
     IndexType NNZ = 0;
     calculate_NNZ(I, J, V, NNZ);
 
     printf("NNZ: %d\n", NNZ );
-    prntf("NNZ SIĘ NIE ZGADZA! Porównać wszystko od początku!");
+
+    C.resize(A.get_ncol(), B.get_nrow(), NNZ);
+    reduce_by_key(I, J, V, C);
+
+    C.save("result.mtx");
+
 }
 
 
@@ -187,7 +193,7 @@ int main(int argc, char *argv[])
     typedef int IndexType;
     OpenCL ocl(0);
 
-    std::string file = "/media/Storage/matrices/mm/orani678.mtx";
+    std::string file = "/home/jpola/Projects/mtx/west0167.mtx";
 
     MatrixCOO<scalar, CPU> A;
     MatrixCOO<scalar, CPU> B;//write copy constructor!
@@ -204,31 +210,35 @@ int main(int argc, char *argv[])
 //    for(int i = 0; i < B.get_nrow() + 1; i++)
 //        offsets[i] = 0;
 
+    printf("\nB_row_offsets: \n");
     calculate_offsets(B, B_row_offsets);
-//    for (int i = 0; i < B.get_nrow() + 1; i++)
-//        printf("\t%d\n", B_row_offsets[i]);
+    for (int i = 0; i < B.get_nrow() + 1; i++)
+        printf("\t%d\n", B_row_offsets[i]);
 
     Vector<IndexType, CPU> B_row_lenghts(B.get_nrow());
-
     calculate_row_lenghts(B_row_offsets, B_row_lenghts);
-//    for (int i = 0; i < coo.get_nrow(); i++)
-//        printf("\ti:%d %d\n", i, B_row_lenghts[i]);
-//    printf("nrow %d\n", coo.get_nrow());
+
+    printf("\nB_row_lenghts: \n");
+    for (int i = 0; i < B.get_nrow(); i++)
+        printf("\ti:%d %d\n", i, B_row_lenghts[i]);
+
     Vector<IndexType, CPU> segment_lengths(A.get_nnz());
 
     Vector<IndexType, CPU> map;
-    map.set_pointerData(A.get_colPtr(), A.get_nnz()); //czy nnz?
+    map.set_pointerData(A.get_colPtr(), A.get_nnz());
     gather(0, A.get_nnz(), B_row_lenghts, map, segment_lengths);
-//    for (int i = 0; i < A.get_nnz(); i++)
-//            printf("\ti:%d %d\n", i, segment_lenghts[i]);
+    printf("\nsegment_lenghts: \n");
+    for (int i = 0; i < A.get_nnz(); i++)
+            printf("\ti:%d %d\n", i, segment_lengths[i]);
     map.release_pointerData();
 
     Vector<IndexType, CPU> output_ptr(A.get_nnz() + 1);
     exclusive_scan(0, segment_lengths.get_size(), segment_lengths, output_ptr);
     //due to different sizes between out_ptr and segments we need to apply last item which not included in scan
     output_ptr[A.get_nnz()]  = output_ptr[A.get_nnz() - 1 ] + segment_lengths[A.get_nnz() - 1];
-//    for (int i = 0; i < A.get_nnz()+1; i++)
-//            printf("\ti:%d %d\n", i, output_ptr[i]);
+    printf("\noutput_ptr: \n");
+    for (int i = 0; i < A.get_nnz()+1; i++)
+            printf("\ti:%d %d\n", i, output_ptr[i]);
 
     int coo_num_nonzeros = output_ptr[A.get_nnz()];
     int workspace_capacity = std::min(coo_num_nonzeros, 16 << 20);

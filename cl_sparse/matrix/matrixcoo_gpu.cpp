@@ -373,5 +373,7 @@ void MatrixCOO<scalar, GPU>::multiply(const Vector<scalar, GPU>& in, Vector<scal
 
 }
 
+
+template class MatrixCOO<int, GPU>;
 template class MatrixCOO<float, GPU>;
 template class MatrixCOO<double, GPU>;

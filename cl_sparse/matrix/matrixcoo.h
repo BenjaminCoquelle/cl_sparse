@@ -76,8 +76,11 @@ public:
     int get_ncol()const;
 
     scalar* get_valPtr() const;
-    int* get_rowPtr() const;
-    int* get_colPtr() const;
+    scalar* get_valPtr();
+    int*    get_rowPtr() const;
+    int*    get_rowPtr();
+    int*    get_colPtr() const;
+    int*    get_colPtr();
 
     void info();
 

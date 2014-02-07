@@ -390,6 +390,7 @@ void MatrixCSR<scalar, CPU>::get_data(const MatrixHYB<scalar, CPU>& matrix)
 }
 
 
+template class MatrixCSR<int, CPU>;
 template class MatrixCSR<float, CPU>;
 template class MatrixCSR<double, CPU>;
 

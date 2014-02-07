@@ -444,6 +444,6 @@ cl_mem MatrixHYB<scalar, GPU>::get_cooValPtr() const
     return this->mat.COO.val;
 }
 
+template class MatrixHYB<int, GPU>;
 template class MatrixHYB<float, GPU>;
 template class MatrixHYB<double, GPU>;
-

@@ -204,5 +204,6 @@ void MatrixELL<scalar, CPU>::multiply(const Vector<scalar, CPU> &in, Vector<scal
 }
 
 
+template class MatrixELL<int, CPU>;
 template class MatrixELL<float, CPU>;
 template class MatrixELL<double, CPU>;

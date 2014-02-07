@@ -390,16 +390,16 @@ void OpenCL::build_kernels_map(bool display)
       - in build_program read proper kernel names
       */
     //vector kernels
-    append_kernel(&kernels, "../../clsparse/cl_sparse/vector_kernels/vector_kernels.cl");
+    append_kernel(&kernels, "../../cl_sparse/cl_sparse/vector_kernels/vector_kernels.cl");
 
     //coo matrix
-    append_kernel(&kernels, "../../clsparse/cl_sparse/coo_kernels/coo_matrix_krenels.cl");
+    append_kernel(&kernels, "../../cl_sparse/cl_sparse/coo_kernels/coo_matrix_krenels.cl");
 
     //csr matrix
-    append_kernel(&kernels, "../../clsparse/cl_sparse/csr_kernels/csr_matrix_krenels.cl");
+    append_kernel(&kernels, "../../cl_sparse/cl_sparse/csr_kernels/csr_matrix_krenels.cl");
 
     //ell matrix
-    append_kernel(&kernels, "../../clsparse/cl_sparse/ell_kernels/ell_matrix_krenels.cl");
+    append_kernel(&kernels, "../../cl_sparse/cl_sparse/ell_kernels/ell_matrix_krenels.cl");
 
     if(display)
     {

@@ -172,5 +172,6 @@ void MatrixELL<scalar, GPU>::multiply(const Vector<scalar, GPU> &in, Vector<scal
     err = clReleaseEvent( ocl_event );
 }
 
+template class MatrixELL<int, GPU>;
 template class MatrixELL<float, GPU>;
 template class MatrixELL<double, GPU>;

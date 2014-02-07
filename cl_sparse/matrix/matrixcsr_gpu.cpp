@@ -322,17 +322,6 @@ void MatrixCSR<scalar,GPU>::test1(const Vector<scalar, GPU>& in, Vector<scalar, 
 
 }
 
+template class MatrixCSR<int, GPU>;
 template class MatrixCSR<float, GPU>;
 template class MatrixCSR<double, GPU>;
-
-
-
-
-
-
-
-
-
-
-
-

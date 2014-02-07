@@ -195,11 +195,31 @@ int* MatrixCOO<scalar, CPU>::get_colPtr() const
     return this->mat.col;
 }
 
+
 template<typename scalar>
 scalar* MatrixCOO<scalar, CPU>::get_valPtr() const
 {
     return this->mat.val;
 }
+
+template<typename scalar>
+int* MatrixCOO<scalar, CPU>::get_rowPtr()
+{
+    return this->mat.row;
+}
+
+template<typename scalar>
+int* MatrixCOO<scalar, CPU>::get_colPtr()
+{
+    return this->mat.col;
+}
+
+template<typename scalar>
+scalar* MatrixCOO<scalar, CPU>::get_valPtr()
+{
+    return this->mat.val;
+}
+
 
 template<typename scalar>
 void MatrixCOO<scalar, CPU>::info()
@@ -218,35 +238,32 @@ void MatrixCOO<scalar, CPU>::resize(const int nrow, const int ncol, const int nn
     {
         //values
         scalar* new_val = new scalar [nnz];
-
         if (this->nnz != 0)
         {
             memcpy(new_val, this->mat.val, nnz*sizeof(scalar));
             delete [] this->mat.val;
         }
-
         this->nnz = nnz;
         this->mat.val = new_val;
 
         //col
         int* new_col = new int [nnz];
-
         if (this->nnz != 0)
         {
-            memcpy(new_col, this->mat.col, nnz*sizeof(int));
+            if(this->mat.col != NULL)
+                memcpy(new_col, this->mat.col, nnz*sizeof(int));
             delete [] this->mat.col;
         }
-
         this->mat.col = new_col;
 
         //row
         int* new_row = new int [nnz];
         if (this->nnz != 0)
         {
-            memcpy(new_row, this->mat.row, nnz*sizeof(int));
+            if(this->mat.row != NULL)
+                memcpy(new_row, this->mat.row, nnz*sizeof(int));
             delete [] this->mat.row;
         }
-
         this->mat.row = new_row;
 
     }
@@ -465,5 +482,7 @@ void MatrixCOO<scalar, CPU>::get_data(const MatrixCSR<scalar, CPU> &matrix)
         this->mat.val[i] = val[i];
 }
 
+
+template class MatrixCOO<int, CPU>;
 template class MatrixCOO<float, CPU>;
 template class MatrixCOO<double, CPU>;

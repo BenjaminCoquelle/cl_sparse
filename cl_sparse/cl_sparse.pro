@@ -51,7 +51,8 @@ SOURCES += main.cpp \
     utils/matrix_utils.cpp \
     utils/gather.cpp \
     utils/scan.cpp \
-    utils/transform.cpp
+    utils/transform.cpp \
+    utils/reduce.cpp
 
 HEADERS += ocl.h \
     vector.h \
@@ -72,7 +73,8 @@ HEADERS += ocl.h \
     utils/matrix_utils.h \
     utils/gather.h \
     utils/scan.h \
-    utils/transform.h
+    utils/transform.h \
+    utils/reduce.h
 
 OTHER_FILES += \
     resources/brief_csr_multip.txt \

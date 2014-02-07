@@ -2,9 +2,13 @@
 #include "utils/gather.h"
 //#include "utils"
 //#include <algorithm>
+#include "vector.h"
+#include <thrust/device_vector.h>
 #include <thrust/sort.h>
 #include <thrust/inner_product.h>
 #include <thrust/iterator/zip_iterator.h>
+
+#include <boost/iterator/zip_iterator.hpp>
 
 
 //row_offsets are the same as in CSR format;
@@ -50,6 +54,21 @@ void calculate_offsets(const MatrixCOO<scalar, CPU>& matrix, Vector<int, CPU>& r
     //last entry
     row_offsets[nrow] = sum;
     //printf("offsets[%d]: %d\n", nrow, offsets[nrow]);
+
+    for (int i = 0; i < nnz; i++)
+    {
+        int row = coo_row[i];
+        row_offsets[row] = row_offsets[row] + 1;
+    }
+
+    int last = 0;
+    for (int i = 0; i <= nrow; i++)
+    {
+        int temp = row_offsets[i];
+        row_offsets[i] = last;
+        last = temp;
+    }
+
 }
 
 
@@ -101,12 +120,26 @@ void calculate_NNZ(const Vector<int, CPU>& I,
                    const Vector<scalar, CPU>& V,
                    int &NNZ)
 {
-    NNZ = thrust::inner_product(thrust::make_zip_iterator(thrust::make_tuple(&I[0], &J[0])),
-                                thrust::make_zip_iterator(thrust::make_tuple(&I[I.get_csize()-1],  &J[J.get_csize()-1])) - 1,
-                                              thrust::make_zip_iterator(thrust::make_tuple(&I[0], &J[0])) + 1,
-                                              0,
-                                              thrust::plus<int>(),
-                                              thrust::not_equal_to< thrust::tuple<int, int> >()) + 1;
+    printf("size of I: %d\n", I.get_csize());
+    printf("size of J: %d\n", J.get_csize());
+    printf("size of V: %d\n", V.get_csize());
+
+
+    int* hi = I.get_cdata();
+    thrust::device_vector<int> di;
+    di.assign(I.get_csize(), *hi);
+
+//    int ble =
+//       thrust::inner_product(thrust::make_zip_iterator(
+//                             thrust::make_tuple(&I[0], &J[0])),
+//                             thrust::make_zip_iterator(
+//                                    thrust::make_tuple(&I[I.get_csize()-1],  &J[J.get_csize()-1])) - 1,
+//                            thrust::make_zip_iterator(thrust::make_tuple(&I[0], &J[0])) + 1,
+//                                  0,
+//                            thrust::plus<int>(),
+//                            thrust::not_equal_to< thrust::tuple<int, int> >());
+//   printf("inner_product = %d\n", ble);
+//   NNZ = ble + 1;
 
 }
 

@@ -320,5 +320,6 @@ scalar* MatrixHYB<scalar, CPU>::get_cooValPtr() const
 }
 
 
+template class MatrixHYB<int, CPU>;
 template class MatrixHYB<float, CPU>;
 template class MatrixHYB<double, CPU>;

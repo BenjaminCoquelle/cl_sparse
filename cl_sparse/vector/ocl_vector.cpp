@@ -496,19 +496,19 @@ void Vector<scalar, GPU>::set(scalar value)
     cl_event fill_event;
     cl_int error;
 
-#ifdef CL_VERSION_1_2    //NVIDIA OpenCL does not support 1.2 :(
-    cl_int error = clEnqueue
-            clEnqueueFillBuffer(OpenCL::get_queue(), data,
-                                &value,
-                                sizeof(scalar),
-                                0,
-                                size*sizeof(scalar), 0, 0, &fill_event);
-    clWaitForEvents(1, &fill_event);
-     if(error != CL_SUCCESS)
-         qCritical() << "Vector (GPU): set failed, Fill buffer: " << OpenCL::getError(error);
+//#ifdef CL_VERSION_1_2    //NVIDIA OpenCL does not support 1.2 :(
+//    cl_int error = clEnqueue
+//            clEnqueueFillBuffer(OpenCL::get_queue(), data,
+//                                &value,
+//                                sizeof(scalar),
+//                                0,
+//                                size*sizeof(scalar), 0, 0, &fill_event);
+//    clWaitForEvents(1, &fill_event);
+//     if(error != CL_SUCCESS)
+//         qCritical() << "Vector (GPU): set failed, Fill buffer: " << OpenCL::getError(error);
 
-     return
-#else
+//     return
+//#else
     scalar* host_array = new scalar[size];
     std::fill(host_array, host_array+size, value);
 
@@ -520,7 +520,7 @@ void Vector<scalar, GPU>::set(scalar value)
     clWaitForEvents(1, &fill_event);
 
     delete [] host_array;
-#endif
+//#endif
 
 
 }
