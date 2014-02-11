@@ -234,25 +234,35 @@ void MatrixCOO<scalar, CPU>::resize(const int nrow, const int ncol, const int nn
     this->ncol = ncol;
 
     // matrix arrays changes only if nnz changes!
-    if (nnz != this->nnz )
+    if(this->nnz != nnz)
     {
+        this->nnz = nnz;
+
         //values
         scalar* new_val = new scalar [nnz];
         if (this->nnz != 0)
         {
-            memcpy(new_val, this->mat.val, nnz*sizeof(scalar));
-            delete [] this->mat.val;
+            if (this->mat.val == NULL)
+                 this->mat.val = new scalar [nnz];
+
+            else {
+                memcpy(new_val, this->mat.val, nnz*sizeof(scalar));
+                delete [] this->mat.val;
+            }
         }
-        this->nnz = nnz;
         this->mat.val = new_val;
 
         //col
         int* new_col = new int [nnz];
         if (this->nnz != 0)
         {
-            if(this->mat.col != NULL)
+            if(this->mat.col == NULL)
+                this->mat.col = new int [nnz];
+            else
+            {
                 memcpy(new_col, this->mat.col, nnz*sizeof(int));
-            delete [] this->mat.col;
+                delete [] this->mat.col;
+            }
         }
         this->mat.col = new_col;
 
@@ -260,13 +270,17 @@ void MatrixCOO<scalar, CPU>::resize(const int nrow, const int ncol, const int nn
         int* new_row = new int [nnz];
         if (this->nnz != 0)
         {
-            if(this->mat.row != NULL)
+            if(this->mat.row == NULL)
+                this->mat.row == new int [nnz];
+            else
+            {
                 memcpy(new_row, this->mat.row, nnz*sizeof(int));
-            delete [] this->mat.row;
+                delete [] this->mat.row;
+            }
         }
         this->mat.row = new_row;
-
     }
+
 }
 
 template<typename scalar>

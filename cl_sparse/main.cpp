@@ -169,13 +169,16 @@ void coo_spmm_helper(int workspace_size,
 
     for (int i = 0; i < V.get_size(); i++)
         printf ("%d: %d, %d, %f\n", i, I[i], J[i], V[i]);
-    I.get_data();
+
     IndexType NNZ = 0;
+
     calculate_NNZ(I, J, V, NNZ);
 
     printf("NNZ: %d\n", NNZ );
 
-    C.resize(A.get_ncol(), B.get_nrow(), NNZ);
+    C.resize(A.get_nrow(), B.get_ncol(), NNZ);
+
+
     reduce_by_key(I, J, V, C);
 
     C.save("result.mtx");
