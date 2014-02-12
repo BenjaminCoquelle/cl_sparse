@@ -20,4 +20,7 @@ void calculate_NNZ(const Vector<int, CPU>& I,
                    const Vector<scalar, CPU>& V,
                    int& NNZ);
 
+int calculate_end_row(const int begin_row,
+                        const Vector<int, CPU> &row_workspace,
+                       const int value);
 #endif // MATRIX_UTILS_H

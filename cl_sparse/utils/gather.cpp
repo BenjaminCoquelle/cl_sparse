@@ -6,7 +6,8 @@ void gather(const int map_first, const int map_last, const Vector<scalar, CPU>& 
     int num_elements = map_last - map_first;
 
     for (int i = 0; i < num_elements; i++)
-        out[i+map_first] = in[map[i]]; //or input[i]
+        out[i] = in[map[i+map_first]]; //or input[i]
+
 }
 
 template

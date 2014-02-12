@@ -1,14 +1,15 @@
 #include "matrix_utils.h"
 #include "utils/gather.h"
-//#include "utils"
-//#include <algorithm>
 #include "vector.h"
-#include <thrust/device_vector.h>
+
+#include <thrust/host_vector.h>
+#include <thrust/functional.h>
 #include <thrust/sort.h>
 #include <thrust/inner_product.h>
-#include <thrust/iterator/zip_iterator.h>
+#include <thrust/binary_search.h>
 
-#include <boost/iterator/zip_iterator.hpp>
+
+
 
 #include <fstream>
 
@@ -49,7 +50,7 @@ void calculate_offsets(const MatrixCOO<scalar, CPU>& matrix, Vector<int, CPU>& r
     {
         int temp = row_offsets[i];
         row_offsets[i] = sum;
-    //    printf("offsets[%d]: %d\n", i, offsets[i]);
+        //printf("offsets[%d]: %d\n", i, row_offsets[i]);
         sum += temp;
     }
     //last entry
@@ -120,10 +121,6 @@ void sort_by_row_and_column(Vector<int, CPU>& I,
 bool is_not_equal ( const int px1, const int py1,
                  const int px2, const int py2)
 {
-//    std::cout << "A: " << px1 << " " << py1 << ", B" << px2 << " " << py2;
-//    bool r = (px1 != px2) || (py1 != py2);
-//    std::cout << " res: " << r << std::endl;
-//    return r;
     return (px1 != px2) || (py1 != py2);
 }
 
@@ -133,62 +130,6 @@ void calculate_NNZ(const Vector<int, CPU>& I,
                    const Vector<scalar, CPU>& V,
                    int &NNZ)
 {
-//    printf("size of I: %d\n", I.get_csize());
-//    printf("size of J: %d\n", J.get_csize());
-//    printf("size of V: %d\n", V.get_csize());
-
-//    std::ofstream fI; fI.open("I.txt");
-//    std::ofstream fJ; fJ.open("J.txt");
-//    std::ofstream fV; fV.open("V.txt");
-
-
-//    //save
-//    for(int i = 0; i < I.get_csize(); i++)
-//    {
-//        fI << i << "\t" << I[i] << std::endl;
-//        fJ << i << "\t" << J[i] << std::endl;
-//        fV << i << "\t" << V[i] << std::endl;
-//    }
-//    //close
-//    fI.close();
-//    fJ.close();
-//    fV.close();
-
-//    // typedef these iterators for shorthand
-//    typedef thrust::host_vector<int>::iterator   IntIterator;
-//    // typedef a tuple of these iterators
-//    typedef thrust::tuple<IntIterator, IntIterator> IteratorTuple;
-//    // typedef the zip_iterator of this tuple
-//    typedef thrust::zip_iterator<IteratorTuple> ZipIterator;
-//    // finally, create the zip_iterator
-//    //ZipIterator iter = thrust::make_zip_iterator(thrust::make_tuple(&I[0], &J[0]));
-//    ZipIterator it = thrust::make_zip_iterator(thrust::make_tuple(I.get_cdata(), J.get_cdata()));
-//    //IteratorTuple it = thrust::make_tuple(I.get_cdata(), J.get_cdata());
-
-//    std::ofstream iter_file; iter_file.open("begin_zip_iter.txt");
-//    for(int i = 0; i < I.get_csize(); i++)
-//    {
-//        iter_file << i << "\t" << thrust::get<0>(it[i]) << "\t" << thrust::get<1>(it[i]) << std::endl;
-//    }
-//    iter_file.close();
-
-//    it = thrust::make_zip_iterator(thrust::make_tuple
-//                                   (I.get_cdata()+I.get_csize()-1,
-//                                    J.get_cdata()+I.get_csize()-1)
-//                                   );
-//    std::cout << "last: " << thrust::get<0>(*it) << "\t" << thrust::get<1>(*it) << std::endl;
-
-//    it = thrust::make_zip_iterator(thrust::make_tuple
-//                                   (I.get_cdata()+I.get_csize()-1,
-//                                    J.get_cdata()+I.get_csize()-1)
-//                                   )-1;
-//    std::cout << "last-1: " << thrust::get<0>(*it) << "\t" << thrust::get<1>(*it) << std::endl;
-
-//    it = thrust::make_zip_iterator(thrust::make_tuple
-//                                   (I.get_cdata(),
-//                                    J.get_cdata())
-//                                   )+1;
-//    std::cout << "first+1: " << thrust::get<0>(*it) << "\t" << thrust::get<1>(*it) << std::endl;
 
     // I J V na pewno mają ten sam rozmiar = workspace_size;
 
@@ -221,18 +162,38 @@ void calculate_NNZ(const Vector<int, CPU>& I,
     firstJ.release_pointerData();
     lastI.release_pointerData();
     lastJ.release_pointerData();
-//    NNZ =
-//       thrust::inner_product(thrust::make_zip_iterator(
-//                             thrust::make_tuple(&I[0], &J[0])),
-//                             thrust::make_zip_iterator(
-//                                    thrust::make_tuple(&I[I.get_csize()-1],  &J[J.get_csize()-1])),
-//                            thrust::make_zip_iterator(thrust::make_tuple(&I[0], &J[0])) + 1,
-//                                  0,
-//                            thrust::plus<int>(),
-//                            thrust::not_equal_to< thrust::tuple<int, int> >())+1;
-//   printf("inner_product = %d\n", NNZ);
+
     NNZ = suma+1;
 
+}
+
+int calculate_end_row( const int begin_row,  const Vector<int, CPU>& row_workspace, const int value)
+{
+    std::cout << "begin:" << *(row_workspace.get_cdata() + begin_row) << std::endl;
+    std::cout << "end: " << *(row_workspace.get_cdata() + (row_workspace.get_csize() - 1)) << std::endl;
+    std::cout << "value to find " << value << std::endl;
+
+    thrust::host_vector<int>::iterator begin = row_workspace.get_cdata();
+    thrust::host_vector<int>::iterator end   = row_workspace.get_cdata() + (row_workspace.get_csize() - 1);
+    int result = thrust::upper_bound(begin + begin_row, end, value) - begin;
+
+    std::cout << "result: "  << result << std::endl;
+//    int* v = new int [5];
+//    v[0] = 0;
+//    v[1] = 3;
+//    v[2] = 4;
+//    v[3] = 4;
+//    v[4] = 6;
+
+//    thrust::host_vector<int>::iterator r = thrust::upper_bound(v, v+5, 4);
+//    std::cout << "r = " << r - << std::endl;
+//    const int* rr = thrust::upper_bound(row_workspace.get_cdata(),
+//                                       row_workspace.get_cdata() + (row_workspace.get_csize() - 1),
+//                                       value);
+//    std::cout << " r2 " << *rr << std::endl;
+//    for ( int i = 0; i < row_workspace.get_csize(); i++)
+//        std::cout << " i = " <<  i << " " << row_workspace[i] << std::endl;
+    return 1;
 }
 
 //template
